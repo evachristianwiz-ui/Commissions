@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GGO - Team Leaders Commissions CRM</title>
     
-    <!-- Firebase SDKs (Compat Version for direct HTML use) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -53,6 +53,11 @@
         .tier1 { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
         .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
+        .status-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+        .status-resigned { background: rgba(234, 179, 8, 0.15); color: #facc15; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+        .status-terminated { background: rgba(239, 68, 68, 0.15); color: #f87171; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+        .status-probation { background: rgba(168, 85, 247, 0.15); color: #c084fc; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+
         .btn-edit { background: #0284c7; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .btn-edit:hover { background: #0369a1; }
         .btn-delete { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
@@ -61,7 +66,7 @@
         .form-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; margin-bottom: 24px; }
         .form-box h3 { margin-top: 0; color: white; font-size: 16px; margin-bottom: 15px; }
         .form-grid { display: flex; gap: 12px; flex-wrap: wrap; }
-        .form-grid input, .form-grid select { flex: 1; min-width: 180px; }
+        .form-grid input, .form-grid select { flex: 1; min-width: 160px; }
         .btn-green { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
     </style>
 </head>
@@ -124,7 +129,7 @@
                 </tr>
             </thead>
             <tbody id="teamTableBody">
-                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Connecting to live Firebase database...</td></tr>
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Connecting to Firebase...</td></tr>
             </tbody>
         </table>
     </div>
@@ -141,6 +146,12 @@
             </select>
             <input type="number" id="newAgentG2G" placeholder="Initial G2G Sales">
             <input type="number" id="newAgentDays" placeholder="Attended Days">
+            <select id="newAgentStatus">
+                <option value="Active">Active</option>
+                <option value="Resigned">Resigned</option>
+                <option value="Terminated">Terminated</option>
+                <option value="On Probation">On Probation</option>
+            </select>
             <button class="btn-green" onclick="addNewAgent()">Add Agent</button>
         </div>
     </div>
@@ -155,6 +166,7 @@
                     <th>G2G Sales</th>
                     <th>Attended Days</th>
                     <th>Agent Ratio</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -166,7 +178,6 @@
 </div>
 
 <script>
-    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCd2Bxzkh3nvsQNRMmFeiiy1q1BtTs-bew",
         authDomain: "ggo-commissions.firebaseapp.com",
@@ -178,70 +189,67 @@
         measurementId: "G-EWQ711WFSW"
     };
 
-    // Initialize Firebase Compat
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     let dbTeams = [];
 
-    // Default Teams & Agents data structure
     const defaultTeams = [
         {
             teamName: "Wazowski",
             leader: "Mavis Miller",
             agents: [
-                { id: 1, name: "Adam", g2g: 20, days: 20 },
-                { id: 2, name: "Victor", g2g: 20, days: 20 },
-                { id: 3, name: "Mia", g2g: 20, days: 20 },
-                { id: 4, name: "Jessy", g2g: 20, days: 20 },
-                { id: 5, name: "Amy", g2g: 20, days: 20 }
+                { id: 1, name: "Adam", g2g: 20, days: 20, status: "Active" },
+                { id: 2, name: "Victor", g2g: 20, days: 20, status: "Active" },
+                { id: 3, name: "Mia", g2g: 20, days: 20, status: "Active" },
+                { id: 4, name: "Jessy", g2g: 20, days: 20, status: "Active" },
+                { id: 5, name: "Amy", g2g: 20, days: 20, status: "Active" }
             ]
         },
         {
             teamName: "Bloom",
             leader: "Donna Bell",
             agents: [
-                { id: 6, name: "Anna", g2g: 20, days: 20 },
-                { id: 7, name: "Heaven", g2g: 20, days: 20 },
-                { id: 8, name: "Celine", g2g: 20, days: 20 },
-                { id: 9, name: "Jules", g2g: 20, days: 20 },
-                { id: 10, name: "Kim", g2g: 20, days: 20 },
-                { id: 11, name: "Jennifer", g2g: 20, days: 20 },
-                { id: 12, name: "Eric", g2g: 20, days: 20 },
-                { id: 13, name: "Roben", g2g: 20, days: 20 }
+                { id: 6, name: "Anna", g2g: 20, days: 20, status: "Active" },
+                { id: 7, name: "Heaven", g2g: 20, days: 20, status: "Active" },
+                { id: 8, name: "Celine", g2g: 20, days: 20, status: "Active" },
+                { id: 9, name: "Jules", g2g: 20, days: 20, status: "Active" },
+                { id: 10, name: "Kim", g2g: 20, days: 20, status: "Active" },
+                { id: 11, name: "Jennifer", g2g: 20, days: 20, status: "Active" },
+                { id: 12, name: "Eric", g2g: 20, days: 20, status: "Active" },
+                { id: 13, name: "Roben", g2g: 20, days: 20, status: "Active" }
             ]
         },
         {
             teamName: "Pgx",
             leader: "Jordan Kelly",
             agents: [
-                { id: 14, name: "Stewart", g2g: 20, days: 20 },
-                { id: 15, name: "Micheal", g2g: 20, days: 20 },
-                { id: 16, name: "Jeremy", g2g: 20, days: 20 },
-                { id: 17, name: "Diana", g2g: 20, days: 20 },
-                { id: 18, name: "Hannah", g2g: 20, days: 20 },
-                { id: 19, name: "Camila", g2g: 20, days: 20 },
-                { id: 20, name: "Catilyn", g2g: 20, days: 20 },
-                { id: 21, name: "Owen", g2g: 20, days: 20 }
+                { id: 14, name: "Stewart", g2g: 20, days: 20, status: "Active" },
+                { id: 15, name: "Micheal", g2g: 20, days: 20, status: "Active" },
+                { id: 16, name: "Jeremy", g2g: 20, days: 20, status: "Active" },
+                { id: 17, name: "Diana", g2g: 20, days: 20, status: "Active" },
+                { id: 18, name: "Hannah", g2g: 20, days: 20, status: "Active" },
+                { id: 19, name: "Camila", g2g: 20, days: 20, status: "Active" },
+                { id: 20, name: "Catilyn", g2g: 20, days: 20, status: "Active" },
+                { id: 21, name: "Owen", g2g: 20, days: 20, status: "Active" }
             ]
         },
         {
             teamName: "Logistics",
             leader: "Joey Millner",
             agents: [
-                { id: 22, name: "Marcy", g2g: 50, days: 20 },
-                { id: 23, name: "Melaine", g2g: 50, days: 20 },
-                { id: 24, name: "Liz", g2g: 50, days: 20 },
-                { id: 25, name: "Ben", g2g: 50, days: 20 },
-                { id: 26, name: "Luke", g2g: 50, days: 20 },
-                { id: 27, name: "Oscar", g2g: 50, days: 20 },
-                { id: 28, name: "Rachel", g2g: 50, days: 20 },
-                { id: 29, name: "David", g2g: 50, days: 20 }
+                { id: 22, name: "Marcy", g2g: 50, days: 20, status: "Active" },
+                { id: 23, name: "Melaine", g2g: 50, days: 20, status: "Active" },
+                { id: 24, name: "Liz", g2g: 50, days: 20, status: "Active" },
+                { id: 25, name: "Ben", g2g: 50, days: 20, status: "Active" },
+                { id: 26, name: "Luke", g2g: 50, days: 20, status: "Active" },
+                { id: 27, name: "Oscar", g2g: 50, days: 20, status: "Active" },
+                { id: 28, name: "Rachel", g2g: 50, days: 20, status: "Active" },
+                { id: 29, name: "David", g2g: 50, days: 20, status: "Active" }
             ]
         }
     ];
 
-    // Listen for Realtime changes from Firebase
     db.ref('teams').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -274,6 +282,7 @@
 
         filteredTeams.forEach(team => {
             let agentsList = team.agents || [];
+            // Calculate active agents metrics only or all agents depending on choice (here active/all agents sales sum)
             let totalG2G = agentsList.reduce((sum, a) => sum + (parseFloat(a.g2g) || 0), 0);
             let totalDays = agentsList.reduce((sum, a) => sum + (parseFloat(a.days) || 0), 0);
             let teamRatio = totalDays > 0 ? (totalG2G / totalDays).toFixed(2) : 0;
@@ -315,12 +324,18 @@
                 agentsList.forEach(agent => {
                     if (agent.name.toLowerCase().includes(searchQuery)) {
                         let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+                        let statusClass = "status-active";
+                        if (agent.status === "Resigned") statusClass = "status-resigned";
+                        if (agent.status === "Terminated") statusClass = "status-terminated";
+                        if (agent.status === "On Probation") statusClass = "status-probation";
+
                         let row = `<tr>
                             <td><b>${agent.name}</b></td>
                             <td>${team.teamName}</td>
                             <td>${agent.g2g}</td>
                             <td>${agent.days}</td>
                             <td><b style="color: var(--accent-blue);">${ratio}</b></td>
+                            <td><span class="${statusClass}">${agent.status || 'Active'}</span></td>
                             <td>
                                 <button class="btn-edit" onclick="editAgent(${agent.id})">Edit</button>
                                 <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
@@ -352,6 +367,7 @@
         let teamName = document.getElementById("newAgentTeam").value;
         let g2g = parseFloat(document.getElementById("newAgentG2G").value);
         let days = parseFloat(document.getElementById("newAgentDays").value);
+        let status = document.getElementById("newAgentStatus").value;
 
         if (!name || isNaN(g2g) || isNaN(days)) {
             alert("Please fill in all agent fields correctly!");
@@ -362,7 +378,7 @@
         if (team) {
             if (!team.agents) team.agents = [];
             let newId = Date.now();
-            team.agents.push({ id: newId, name, g2g, days });
+            team.agents.push({ id: newId, name, g2g, days, status });
             saveDataToFirebase();
             document.getElementById("newAgentName").value = "";
             document.getElementById("newAgentG2G").value = "";
@@ -371,25 +387,59 @@
     }
 
     function editAgent(agentId) {
+        let targetAgent = null;
+        let currentTeamName = "";
+
         dbTeams.forEach(team => {
             if (team.agents) {
-                let foundAgent = team.agents.find(a => a.id === agentId);
-                if (foundAgent) {
-                    let newG2G = prompt(`Enter new G2G Sales for ${foundAdvisor = foundAgent.name}:`, foundAgent.g2g);
-                    if (newG2G === null) return;
-                    let newDays = prompt(`Enter new Attended Days for ${foundAgent.name}:`, foundAgent.days);
-                    if (newDays === null) return;
-
-                    if (!isNaN(parseFloat(newG2G)) && !isNaN(parseFloat(newDays))) {
-                        foundAgent.g2g = parseFloat(newG2G);
-                        foundAgent.days = parseFloat(newDays);
-                        saveDataToFirebase();
-                    } else {
-                        alert("Invalid numbers entered!");
-                    }
+                let found = team.agents.find(a => a.id === agentId);
+                if (found) {
+                    targetAgent = found;
+                    currentTeamName = team.teamName;
                 }
             }
         });
+
+        if (targetAgent) {
+            let newName = prompt("Edit Agent Name:", targetAgent.name);
+            if (newName === null) return;
+
+            let newTeam = prompt("Edit Team Name (Wazowski, Bloom, Pgx, Logistics):", currentTeamName);
+            if (newTeam === null) return;
+
+            let newG2G = prompt("Edit G2G Sales:", targetAgent.g2g);
+            if (newG2G === null) return;
+
+            let newDays = prompt("Edit Attended Days:", targetAgent.days);
+            if (newDays === null) return;
+
+            let newStatus = prompt("Edit Status (Active, Resigned, Terminated, On Probation):", targetAgent.status || "Active");
+            if (newStatus === null) return;
+
+            // Remove from old team and push to new team or update in place
+            dbTeams.forEach(team => {
+                if (team.agents) {
+                    team.agents = team.agents.filter(a => a.id !== agentId);
+                }
+            });
+
+            let destTeam = dbTeams.find(t => t.teamName.toLowerCase() === newTeam.trim().toLowerCase());
+            if (!destTeam) {
+                alert("Team name not found! Keeping original team.");
+                destTeam = dbTeams.find(t => t.teamName === currentTeamName);
+            }
+
+            if (!destTeam.agents) destTeam.agents = [];
+            destTeam.agents.push({
+                id: agentId,
+                name: newName.trim(),
+                g2g: parseFloat(newG2G) || 0,
+                days: parseFloat(newDays) || 0,
+                status: newStatus.trim()
+            });
+
+            saveDataToFirebase();
+        }
     }
 
     function deleteAgent(agentId) {
