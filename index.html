@@ -3,135 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Call Center Commission CRM</title>
+    <title>GGO - Agents Production & Commissions</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; }
-        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        select, input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
-        th { background-color: #f8f9fa; color: #2c3e50; }
-        .badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block; }
-        .tier3 { background-color: #d4edda; color: #155724; }
-        .tier2 { background-color: #cce5ff; color: #004085; }
-        .tier1 { background-color: #fff3cd; color: #856404; }
-        .not-qualified { background-color: #f8d7da; color: #721c24; }
-        .form-box { background: #fdfdfd; border: 1px solid #e1e1e1; padding: 15px; border-radius: 6px; margin-top: 20px; }
-        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
+        :root {
+            --bg-dark: #0b1329;
+            --card-bg: #111c38;
+            --border-color: #1e295b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --btn-active: #0284c7;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-dark); margin: 0; padding: 20px; color: var(--text-main); }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Top Navigation Bar */
+        .navbar { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 12px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 24px; }
+        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px; color: white; }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .nav-links a.active { background: #0284c7; color: white; }
+        .nav-links a:hover:not(.active) { background: rgba(255,255,255,0.05); color: white; }
+
+        /* Header Title */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .page-title { font-size: 16px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .page-title span { color: var(--text-main); font-weight: bold; }
+        
+        .action-btns { display: flex; gap: 10px; }
+        .btn-green { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .btn-blue { background: #06b6d4; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; }
+        .stat-card .title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-card .value { font-size: 24px; font-weight: bold; color: white; }
+
+        /* Filters Bar */
+        .filters-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; background: var(--card-bg); padding: 16px; border-radius: 10px; border: 1px solid var(--border-color); }
+        select, input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: #080e21; color: white; outline: none; }
+        select:focus, input:focus { border-color: var(--accent-blue); }
+
+        /* Table Design */
+        .table-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: left; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        th { background-color: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+        tr:hover { background-color: rgba(255,255,255,0.02); }
+
+        /* Badges */
+        .badge { padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
+        .tier3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .tier2 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tier1 { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* Add Agent Form Box */
+        .form-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; margin-top: 24px; }
+        .form-box h3 { margin-top: 0; color: white; font-size: 16px; margin-bottom: 15px; }
+        .form-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+        .form-grid input, .form-grid select { flex: 1; min-width: 180px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🎯 Call Center Commission & CRM Dashboard</h2>
-    <p>إدارة أشرطة ومراتب التايرز لفرق (Wazowski, Bloom, PGX, Logistics)</p>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="logo-area">
+            <span>⚡ GGO CRM</span>
+        </div>
+        <div class="nav-links">
+            <a href="#">📊 Dashboard</a>
+            <a href="#" class="active">👥 Agents Production</a>
+            <a href="#">📋 Day-to-Day Floor</a>
+            <a href="#">💡 Knowledge Base</a>
+        </div>
+    </div>
 
-    <!-- Filters -->
-    <div class="filters">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-title">
+            <span>|</span> Production per agent & Top Achievers (Payroll Cycle: 28th to 27th)
+        </div>
+        <div class="action-btns">
+            <button class="btn-green">⚡ Migrate Active to October</button>
+            <button class="btn-blue">+ Add Agent</button>
+        </div>
+    </div>
+
+    <!-- Top Summary Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="title">ACTIVE AGENTS 🟢 (CLICK TO RESET)</div>
+            <div class="value" id="totalAgentsCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="title">ACTIVE G2G ACHIEVED (≥ 0.85) 🟢</div>
+            <div class="value" id="achievedCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="title">ACTIVE G2G BELOW (< 0.85) 🔴</div>
+            <div class="value" id="belowCount">0</div>
+        </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
         <select id="filterTeam" onchange="filterTable()">
-            <option value="">كل الفرق (All Teams)</option>
+            <option value="">All Teams</option>
             <option value="Wazowski">Wazowski</option>
             <option value="Bloom">Bloom</option>
             <option value="Pgx">Pgx</option>
             <option value="Logistics">Logistics</option>
         </select>
+        <input type="text" id="searchAgent" placeholder="Search agent..." onkeyup="filterTable()" style="max-width: 250px;">
     </div>
 
-    <!-- Table -->
-    <table id="agentTable">
-        <thead>
-            <tr>
-                <th>اسم الأージェنت (Agent Name)</th>
-                <th>الفريق (Team)</th>
-                <th>إجمالي G2G</th>
-                <th>الأيام المحضورة (Attended Days)</th>
-                <th>النسبة (Ratio)</th>
-                <th>الحالة والتاير (Status & Target)</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <!-- Data will load here -->
-        </tbody>
-    </table>
+    <!-- Data Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent Name</th>
+                    <th>Team</th>
+                    <th>Total G2G's</th>
+                    <th>Attended Days</th>
+                    <th>G2G Ratio</th>
+                    <th>Status & Tiers</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Loaded via JS -->
+            </tbody>
+        </table>
+    </div>
 
     <!-- Add Agent Form -->
     <div class="form-box">
-        <h3>➕ إضافة أージェنت جديد أو تحديث بيانات</h3>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <input type="text" id="agentName" placeholder="اسم الأージェنت">
+        <h3>➕ Quick Add Agent Production</h3>
+        <div class="form-grid">
+            <input type="text" id="agentName" placeholder="Agent Full Name">
             <select id="agentTeam">
                 <option value="Wazowski">Wazowski</option>
                 <option value="Bloom">Bloom</option>
                 <option value="Pgx">Pgx</option>
                 <option value="Logistics">Logistics</option>
             </select>
-            <input type="number" id="agentG2G" placeholder="إجمالي G2G Sales">
-            <input type="number" id="agentDays" placeholder="أيام الحضور (Attended)">
-            <button onclick="addAgent()">إضافة للقائمة</button>
+            <input type="number" id="agentG2G" placeholder="Total G2G Sales">
+            <input type="number" id="agentDays" placeholder="Attended Days">
+            <button class="btn-blue" onclick="addAgent()">Save Agent</button>
         </div>
     </div>
 </div>
 
 <script>
-    // بيانات تجريبية مبدئية
     let agents = [
-        { name: "أحمد محمد", team: "Wazowski", g2g: 28, days: 20 },
-        { name: "سارة خالد", team: "Logistics", g2g: 60, days: 20 },
-        { name: "محمود علي", team: "Bloom", g2g: 15, days: 18 }
+        { name: "Mia Cooper", team: "Wazowski", g2g: 28, days: 20 },
+        { name: "Heaven Davis", team: "Logistics", g2g: 60, days: 20 },
+        { name: "Roben Neves", team: "Bloom", g2g: 15, days: 18 },
+        { name: "Caitlyn Adam", team: "Pgx", g2g: 22, days: 20 }
     ];
 
     function renderTable(dataToDisplay = agents) {
         const tbody = document.getElementById("tableBody");
         tbody.innerHTML = "";
 
-        dataToDisplay.forEach((agent, index) => {
+        let achieved = 0;
+        let below = 0;
+
+        if(dataToDisplay.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No agents found.</td></tr>`;
+            return;
+        }
+
+        dataToDisplay.forEach((agent) => {
             let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
-            let statusHtml = getStatusAndMissing(agent.team, parseFloat(ratio));
+            let numericRatio = parseFloat(ratio);
+            
+            if (numericRatio >= 0.85) { achieved++; } else { below++; }
+
+            let statusHtml = getStatusAndMissing(agent.team, numericRatio);
 
             let row = `<tr>
-                <td>${agent.name}</td>
+                <td><b>${agent.name}</b></td>
                 <td>${agent.team}</td>
                 <td>${agent.g2g}</td>
                 <td>${agent.days}</td>
-                <td><b>${ratio}</b></td>
+                <td><b style="color: var(--accent-blue);">${ratio}</b></td>
                 <td>${statusHtml}</td>
             </tr>`;
             tbody.innerHTML += row;
         });
+
+        document.getElementById("totalAgentsCount").innerText = agents.length;
+        document.getElementById("achievedCount").innerText = achieved;
+        document.getElementById("belowCount").innerText = below;
     }
 
     function getStatusAndMissing(team, ratio) {
         if (team === "Wazowski" || team === "Bloom" || team === "Pgx") {
-            if (ratio >= 1.2) return `<span class="badge tier3">Tier 3 Qualified! 🟢</span>`;
-            if (ratio >= 1.0) return `<span class="badge tier2">Tier 2 Qualified (ناقص ${(1.2 - ratio).toFixed(2)} للـ Tier 3)</span>`;
-            if (ratio >= 0.85) return `<span class="badge tier1">Tier 1 Qualified (ناقص ${(1.0 - ratio).toFixed(2)} للـ Tier 2)</span>`;
-            return `<span class="badge not-qualified">غير مؤهل (ناقص ${(0.85 - ratio).toFixed(2)} للـ Tier 1)</span>`;
+            if (ratio >= 1.2) return `<span class="badge tier3">🟢 Tier 3 Qualified</span>`;
+            if (ratio >= 1.0) return `<span class="badge tier2">🔵 Tier 2 (Missing ${(1.2 - ratio).toFixed(2)})</span>`;
+            if (ratio >= 0.85) return `<span class="badge tier1">🟡 Tier 1 (Missing ${(1.0 - ratio).toFixed(2)})</span>`;
+            return `<span class="badge not-qualified">🔴 Not Qualified (Missing ${(0.85 - ratio).toFixed(2)})</span>`;
         } else if (team === "Logistics") {
-            if (ratio >= 3.0) return `<span class="badge tier2">Tier 2 Qualified! 🟢</span>`;
-            if (ratio >= 2.5) return `<span class="badge tier1">Tier 1 Qualified (ناقص ${(3.0 - ratio).toFixed(2)} للـ Tier 2)</span>`;
-            return `<span class="badge not-qualified">غير مؤهل (ناقص ${(2.5 - ratio).toFixed(2)} للـ Tier 1)</span>`;
+            if (ratio >= 3.0) return `<span class="badge tier2">🟢 Tier 2 Qualified</span>`;
+            if (ratio >= 2.5) return `<span class="badge tier1">🟡 Tier 1 (Missing ${(3.0 - ratio).toFixed(2)})</span>`;
+            return `<span class="badge not-qualified">🔴 Not Qualified (Missing ${(2.5 - ratio).toFixed(2)})</span>`;
         }
-        return "غير محدد";
+        return "N/A";
     }
 
     function addAgent() {
-        let name = document.getElementById("agentName").value;
+        let name = document.getElementById("agentName").value.trim();
         let team = document.getElementById("agentTeam").value;
         let g2g = parseFloat(document.getElementById("agentG2G").value);
         let days = parseFloat(document.getElementById("agentDays").value);
 
         if (!name || isNaN(g2g) || isNaN(days)) {
-            alert("من فضلك املأ جميع الحقول بشكل صحيح!");
+            alert("Please fill in all fields correctly!");
             return;
         }
 
         agents.push({ name, team, g2g, days });
         renderTable();
 
-        // تفريغ الحقول بعد الإضافة
         document.getElementById("agentName").value = "";
         document.getElementById("agentG2G").value = "";
         document.getElementById("agentDays").value = "";
@@ -139,15 +238,17 @@
 
     function filterTable() {
         let selectedTeam = document.getElementById("filterTeam").value;
-        if (selectedTeam === "") {
-            renderTable(agents);
-        } else {
-            let filtered = agents.filter(a => a.team === selectedTeam);
-            renderTable(filtered);
-        }
+        let searchQuery = document.getElementById("searchAgent").value.toLowerCase();
+
+        let filtered = agents.filter(a => {
+            let matchesTeam = selectedTeam === "" || a.team === selectedTeam;
+            let matchesSearch = a.name.toLowerCase().includes(searchQuery);
+            return matchesTeam && matchesSearch;
+        });
+
+        renderTable(filtered);
     }
 
-    // تشغيل الجدول لأول مرة
     renderTable();
 </script>
 
