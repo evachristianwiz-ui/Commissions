@@ -53,12 +53,19 @@
         .tier1 { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
         .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
+        /* Buttons Inside Table */
+        .btn-edit { background: #0284c7; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+        .btn-edit:hover { background: #0369a1; }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+        .btn-delete:hover { background: #dc2626; }
+
         /* Form Box */
-        .form-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; }
+        .form-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; margin-bottom: 24px; }
         .form-box h3 { margin-top: 0; color: white; font-size: 16px; margin-bottom: 15px; }
         .form-grid { display: flex; gap: 12px; flex-wrap: wrap; }
         .form-grid input, .form-grid select { flex: 1; min-width: 180px; }
         .btn-blue { background: #06b6d4; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .btn-green { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -70,7 +77,7 @@
             <span>⚡ GGO CRM</span>
         </div>
         <div class="nav-links">
-            <a href="#">👥 Commissions Dashboard (Team Leaders)</a>
+            <a href="#">👥 Commissions Dashboard & Teams</a>
         </div>
     </div>
 
@@ -99,13 +106,14 @@
 
     <!-- Filters Bar -->
     <div class="filters-bar">
-        <select id="filterTeam" onchange="renderDashboard()">
+        <select id="filterTeam" onchange="renderAll()">
             <option value="">All Teams</option>
             <option value="Wazowski">Wazowski</option>
             <option value="Bloom">Bloom</option>
             <option value="Pgx">Pgx</option>
             <option value="Logistics">Logistics</option>
         </select>
+        <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderAll()" style="max-width: 250px;">
     </div>
 
     <!-- Team Leaders Summary Table -->
@@ -128,86 +136,109 @@
         </table>
     </div>
 
-    <!-- Agents Production Input Data Control -->
+    <!-- Add New Agent Form Box -->
     <div class="form-box">
-        <h3>➕ Update Agent Production (Daily G2G / Days)</h3>
+        <h3>➕ Add New Agent to Team</h3>
         <div class="form-grid">
-            <select id="selectTeamName" onchange="updateAgentDropdown()">
+            <input type="text" id="newAgentName" placeholder="Agent Full Name">
+            <select id="newAgentTeam">
                 <option value="Wazowski">Wazowski</option>
                 <option value="Bloom">Bloom</option>
                 <option value="Pgx">Pgx</option>
                 <option value="Logistics">Logistics</option>
             </select>
-            <select id="selectAgentName">
-                <!-- Agents populate dynamically -->
-            </select>
-            <input type="number" id="inputG2G" placeholder="G2G Sales to Add/Set">
-            <input type="number" id="inputDays" placeholder="Attended Days">
-            <button class="btn-blue" onclick="saveAgentProduction()">Update Production</button>
+            <input type="number" id="newAgentG2G" placeholder="Initial G2G Sales">
+            <input type="number" id="newAgentDays" placeholder="Attended Days">
+            <button class="btn-green" onclick="addNewAgent()">Add Agent</button>
         </div>
+    </div>
+
+    <!-- Agents Detailed Production Table with Edit -->
+    <div class="table-container">
+        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">📋 Agents Daily Production & Edit Panel</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent Name</th>
+                    <th>Team</th>
+                    <th>G2G Sales</th>
+                    <th>Attended Days</th>
+                    <th>Agent Ratio</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="agentsTableBody">
+                <!-- Loaded via JS -->
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    // قاعدة بيانات الفرق والليدرز والأージェنتس التابعين لهم
-    let teamsData = [
+    let dbTeams = [
         {
             teamName: "Wazowski",
             leader: "Mavis Miller",
             agents: [
-                { name: "Adam", g2g: 25, days: 20 },
-                { name: "Victor", g2g: 22, days: 20 },
-                { name: "Mia", g2g: 30, days: 20 },
-                { name: "Jessy", g2g: 18, days: 20 },
-                { name: "Amy", g2g: 25, days: 20 }
+                { id: 1, name: "Adam", g2g: 25, days: 20 },
+                { id: 2, name: "Victor", g2g: 22, days: 20 },
+                { id: 3, name: "Mia", g2g: 30, days: 20 },
+                { id: 4, name: "Jessy", g2g: 18, days: 20 },
+                { id: 5, name: "Amy", g2g: 25, days: 20 }
             ]
         },
         {
             teamName: "Bloom",
             leader: "Donna Bell",
             agents: [
-                { name: "Anna", g2g: 20, days: 20 },
-                { name: "Heaven", g2g: 22, days: 20 },
-                { name: "Celine", g2g: 19, days: 20 },
-                { name: "Jules", g2g: 24, days: 20 },
-                { name: "Kim", g2g: 21, days: 20 },
-                { name: "Jennifer", g2g: 23, days: 20 },
-                { name: "Eric", g2g: 25, days: 20 },
-                { name: "Roben", g2g: 26, days: 20 }
+                { id: 6, name: "Anna", g2g: 20, days: 20 },
+                { id: 7, name: "Heaven", g2g: 22, days: 20 },
+                { id: 8, name: "Celine", g2g: 19, days: 20 },
+                { id: 9, name: "Jules", g2g: 24, days: 20 },
+                { id: 10, name: "Kim", g2g: 21, days: 20 },
+                { id: 11, name: "Jennifer", g2g: 23, days: 20 },
+                { id: 12, name: "Eric", g2g: 25, days: 20 },
+                { id: 13, name: "Roben", g2g: 26, days: 20 }
             ]
         },
         {
             teamName: "Pgx",
             leader: "Jordan Kelly",
             agents: [
-                { name: "Stewart", g2g: 24, days: 20 },
-                { name: "Micheal", g2g: 20, days: 20 },
-                { name: "Jeremy", g2g: 22, days: 20 },
-                { name: "Diana", g2g: 25, days: 20 },
-                { name: "Hannah", g2g: 19, days: 20 },
-                { name: "Camila", g2g: 21, days: 20 },
-                { name: "Catilyn", g2g: 26, days: 20 },
-                { name: "Owen", g2g: 23, days: 20 }
+                { id: 14, name: "Stewart", g2g: 24, days: 20 },
+                { id: 15, name: "Micheal", g2g: 20, days: 20 },
+                { id: 16, name: "Jeremy", g2g: 22, days: 20 },
+                { id: 17, name: "Diana", g2g: 25, days: 20 },
+                { id: 18, name: "Hannah", g2g: 19, days: 20 },
+                { id: 19, name: "Camila", g2g: 21, days: 20 },
+                { id: 20, name: "Catilyn", g2g: 26, days: 20 },
+                { id: 21, name: "Owen", g2g: 23, days: 20 }
             ]
         },
         {
             teamName: "Logistics",
             leader: "Joey Millner",
             agents: [
-                { name: "Marcy", g2g: 50, days: 20 },
-                { name: "Melaine", g2g: 55, days: 20 },
-                { name: "Liz", g2g: 48, days: 20 },
-                { name: "Ben", g2g: 60, days: 20 },
-                { name: "Luke", g2g: 52, days: 20 },
-                { name: "Oscar", g2g: 58, days: 20 },
-                { name: "Rachel", g2g: 53, days: 20 },
-                { name: "David", g2g: 54, days: 20 }
+                { id: 22, name: "Marcy", g2g: 50, days: 20 },
+                { id: 23, name: "Melaine", g2g: 55, days: 20 },
+                { id: 24, name: "Liz", g2g: 48, days: 20 },
+                { id: 25, name: "Ben", g2g: 60, days: 20 },
+                { id: 26, name: "Luke", g2g: 52, days: 20 },
+                { id: 27, name: "Oscar", g2g: 58, days: 20 },
+                { id: 28, name: "Rachel", g2g: 53, days: 20 },
+                { id: 29, name: "David", g2g: 54, days: 20 }
             ]
         }
     ];
 
-    function renderDashboard() {
-        const tbody = document.getElementById("tableBody");
+    let nextAgentId = 30;
+
+    function renderAll() {
+        renderTeamsSummary();
+        renderAgentsTable();
+    }
+
+    function renderTeamsSummary() {
         const selectedFilter = document.getElementById("filterTeam").value;
         const teamTableBody = document.getElementById("teamTableBody");
         teamTableBody.innerHTML = "";
@@ -215,7 +246,7 @@
         let qualifiedCount = 0;
         let belowCount = 0;
 
-        let filteredTeams = teamsData.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
+        let filteredTeams = dbTeams.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
 
         filteredTeams.forEach(team => {
             let totalG2G = team.agents.reduce((sum, a) => sum + a.g2g, 0);
@@ -225,7 +256,7 @@
 
             let statusHtml = getTeamStatus(team.teamName, numericRatio);
 
-            if (numericRatio >= 0.85 && team.teamName !== "Logistics" || numericRatio >= 2.5 && team.teamName === "Logistics") {
+            if ((team.teamName !== "Logistics" && numericRatio >= 0.85) || (team.teamName === "Logistics" && numericRatio >= 2.5)) {
                 qualifiedCount++;
             } else {
                 belowCount++;
@@ -244,7 +275,36 @@
 
         document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
         document.getElementById("belowTeamsCount").innerText = belowCount;
-        document.getElementById("totalTeamsCount").innerText = teamsData.length;
+        document.getElementById("totalTeamsCount").innerText = dbTeams.length;
+    }
+
+    function renderAgentsTable() {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
+        const agentsTableBody = document.getElementById("agentsTableBody");
+        agentsTableBody.innerHTML = "";
+
+        dbTeams.forEach(team => {
+            if (selectedFilter === "" || team.teamName === selectedFilter) {
+                team.agents.forEach(agent => {
+                    if (agent.name.toLowerCase().includes(searchQuery)) {
+                        let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+                        let row = `<tr>
+                            <td><b>${agent.name}</b></td>
+                            <td>${team.teamName}</td>
+                            <td>${agent.g2g}</td>
+                            <td>${agent.days}</td>
+                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
+                            <td>
+                                <button class="btn-edit" onclick="editAgent(${agent.id})">Edit</button>
+                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                        agentsTableBody.innerHTML += row;
+                    }
+                });
+            }
+        });
     }
 
     function getTeamStatus(teamName, ratio) {
@@ -261,49 +321,63 @@
         return "N/A";
     }
 
-    function updateAgentDropdown() {
-        let teamName = document.getElementById("selectTeamName").value;
-        let agentSelect = document.getElementById("selectAgentName");
-        agentSelect.innerHTML = "";
+    function addNewAgent() {
+        let name = document.getElementById("newAgentName").value.trim();
+        let teamName = document.getElementById("newAgentTeam").value;
+        let g2g = parseFloat(document.getElementById("newAgentG2G").value);
+        let days = parseFloat(document.getElementById("newAgentDays").value);
 
-        let foundTeam = teamsData.find(t => t.teamName === teamName);
-        if (foundTeam) {
-            foundTeam.agents.forEach(agent => {
-                let opt = document.createElement("option");
-                opt.value = agent.name;
-                opt.text = `${agent.name} (G2G: ${agent.g2g}, Days: ${agent.days})`;
-                agentSelect.appendChild(opt);
-            });
-        }
-    }
-
-    function saveAgentProduction() {
-        let teamName = document.getElementById("selectTeamName").value;
-        let agentName = document.getElementById("selectAgentName").value;
-        let newG2G = parseFloat(document.getElementById("inputG2G").value);
-        let newDays = parseFloat(document.getElementById("inputDays").value);
-
-        if (isNaN(newG2G) || isNaN(newDays)) {
-            alert("Please enter valid numbers for G2G and Days!");
+        if (!name || isNaN(g2g) || isNaN(days)) {
+            alert("Please fill in all agent fields correctly!");
             return;
         }
 
-        let foundTeam = teamsData.find(t => t.teamName === teamName);
-        if (foundTeam) {
-            let foundAgent = foundTeam.agents.find(a => a.name === agentName);
-            if (foundAgent) {
-                foundAgent.g2g = newG2G;
-                foundAgent.days = newDays;
-                renderDashboard();
-                updateAgentDropdown();
-                alert("Agent production updated successfully, and Team ratio recalculated!");
+        let team = dbTeams.find(t => t.teamName === teamName);
+        if (team) {
+            team.agents.push({ id: nextAgentId++, name, g2g, days });
+            renderAll();
+            document.getElementById("newAgentName").value = "";
+            document.getElementById("newAgentG2G").value = "";
+            document.getElementById("newAgentDays").value = "";
+            alert("Agent added successfully!");
+        }
+    }
+
+    function editAgent(agentId) {
+        let foundAgent = null;
+        dbTeams.forEach(team => {
+            let ag = team.agents.find(a => a.id === agentId);
+            if (ag) foundAgent = ag;
+        });
+
+        if (foundAgent) {
+            let newG2G = prompt(`Enter new G2G Sales for ${foundAgent.name}:`, foundAgent.g2g);
+            if (newG2G === null) return;
+            let newDays = prompt(`Enter new Attended Days for ${foundAgent.name}:`, foundAgent.days);
+            if (newDays === null) return;
+
+            if (!isNaN(parseFloat(newG2G)) && !isNaN(parseFloat(newDays))) {
+                foundAgent.g2g = parseFloat(newG2G);
+                foundAgent.days = parseFloat(newDays);
+                renderAll();
+                alert("Agent updated successfully, and Team performance ratio updated!");
+            } else {
+                alert("Invalid numbers entered!");
             }
         }
     }
 
-    // Initialize
-    renderDashboard();
-    updateAgentDropdown();
+    function deleteAgent(agentId) {
+        if (confirm("Are you sure you want to delete this agent?")) {
+            dbTeams.forEach(team => {
+                team.agents = team.agents.filter(a => a.id !== agentId);
+            });
+            renderAll();
+        }
+    }
+
+    // Initialize Page Load
+    renderAll();
 </script>
 
 </body>
