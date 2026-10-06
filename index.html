@@ -65,7 +65,6 @@
         .form-box h3 { margin-top: 0; color: white; font-size: 16px; margin-bottom: 15px; }
         .form-grid { display: flex; gap: 12px; flex-wrap: wrap; }
         .form-grid input, .form-grid select { flex: 1; min-width: 180px; }
-        .btn-blue { background: #06b6d4; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
         .btn-green { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
     </style>
 </head>
@@ -75,7 +74,6 @@
     <!-- Navigation Bar -->
     <div class="navbar">
         <div class="logo-area">
-            <!-- Logo link with fallback -->
             <img src="GGO-White-Var3 (1).png" alt="Company Logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
             <span id="fallback-logo" style="display:none;">GGO CRM</span>
         </div>
@@ -98,11 +96,11 @@
             <div class="value" id="totalTeamsCount">4</div>
         </div>
         <div class="stat-card">
-            <div class="title">TEAMS QUALIFIED (ACHIEVED) 🟢</div>
+            <div class="title">TEAMS QUALIFIED (ACHIEVED)</div>
             <div class="value" id="qualifiedTeamsCount">0</div>
         </div>
         <div class="stat-card">
-            <div class="title">TEAMS BELOW TARGET 🔴</div>
+            <div class="title">TEAMS BELOW TARGET</div>
             <div class="value" id="belowTeamsCount">0</div>
         </div>
     </div>
@@ -111,10 +109,10 @@
     <div class="filters-bar">
         <select id="filterTeam" onchange="renderAll()">
             <option value="">All Teams</option>
-            <option value="Wazowski">Wazowski</option>
-            <option value="Bloom">Bloom</option>
-            <option value="Pgx">Pgx</option>
-            <option value="Logistics">Logistics</option>
+            <option value="Wazowski">Wazowski (TL: Mavis Miller)</option>
+            <option value="Bloom">Bloom (TL: Donna Bell)</option>
+            <option value="Pgx">Pgx (TL: Jordan Kelly)</option>
+            <option value="Logistics">Logistics (TL: Joey Millner)</option>
         </select>
         <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderAll()" style="max-width: 250px;">
     </div>
@@ -178,16 +176,17 @@
 </div>
 
 <script>
+    // قاعدة البيانات بالأسماء الكاملة للأージェنتس والليدرز التي طلبتها
     let dbTeams = [
         {
             teamName: "Wazowski",
             leader: "Mavis Miller",
             agents: [
-                { id: 1, name: "Adam", g2g: 25, days: 20 },
-                { id: 2, name: "Victor", g2g: 22, days: 20 },
-                { id: 3, name: "Mia", g2g: 30, days: 20 },
-                { id: 4, name: "Jessy", g2g: 18, days: 20 },
-                { id: 5, name: "Amy", g2g: 25, days: 20 }
+                { id: 1, name: "Adam", g2g: 20, days: 20 },
+                { id: 2, name: "Victor", g2g: 20, days: 20 },
+                { id: 3, name: "Mia", g2g: 20, days: 20 },
+                { id: 4, name: "Jessy", g2g: 20, days: 20 },
+                { id: 5, name: "Amy", g2g: 20, days: 20 }
             ]
         },
         {
@@ -195,27 +194,27 @@
             leader: "Donna Bell",
             agents: [
                 { id: 6, name: "Anna", g2g: 20, days: 20 },
-                { id: 7, name: "Heaven", g2g: 22, days: 20 },
-                { id: 8, name: "Celine", g2g: 19, days: 20 },
-                { id: 9, name: "Jules", g2g: 24, days: 20 },
-                { id: 10, name: "Kim", g2g: 21, days: 20 },
-                { id: 11, name: "Jennifer", g2g: 23, days: 20 },
-                { id: 12, name: "Eric", g2g: 25, days: 20 },
-                { id: 13, name: "Roben", g2g: 26, days: 20 }
+                { id: 7, name: "Heaven", g2g: 20, days: 20 },
+                { id: 8, name: "Celine", g2g: 20, days: 20 },
+                { id: 9, name: "Jules", g2g: 20, days: 20 },
+                { id: 10, name: "Kim", g2g: 20, days: 20 },
+                { id: 11, name: "Jennifer", g2g: 20, days: 20 },
+                { id: 12, name: "Eric", g2g: 20, days: 20 },
+                { id: 13, name: "Roben", g2g: 20, days: 20 }
             ]
         },
         {
             teamName: "Pgx",
             leader: "Jordan Kelly",
             agents: [
-                { id: 14, name: "Stewart", g2g: 24, days: 20 },
+                { id: 14, name: "Stewart", g2g: 20, days: 20 },
                 { id: 15, name: "Micheal", g2g: 20, days: 20 },
-                { id: 16, name: "Jeremy", g2g: 22, days: 20 },
-                { id: 17, name: "Diana", g2g: 25, days: 20 },
-                { id: 18, name: "Hannah", g2g: 19, days: 20 },
-                { id: 19, name: "Camila", g2g: 21, days: 20 },
-                { id: 20, name: "Catilyn", g2g: 26, days: 20 },
-                { id: 21, name: "Owen", g2g: 23, days: 20 }
+                { id: 16, name: "Jeremy", g2g: 20, days: 20 },
+                { id: 17, name: "Diana", g2g: 20, days: 20 },
+                { id: 18, name: "Hannah", g2g: 20, days: 20 },
+                { id: 19, name: "Camila", g2g: 20, days: 20 },
+                { id: 20, name: "Catilyn", g2g: 20, days: 20 },
+                { id: 21, name: "Owen", g2g: 20, days: 20 }
             ]
         },
         {
@@ -223,13 +222,13 @@
             leader: "Joey Millner",
             agents: [
                 { id: 22, name: "Marcy", g2g: 50, days: 20 },
-                { id: 23, name: "Melaine", g2g: 55, days: 20 },
-                { id: 24, name: "Liz", g2g: 48, days: 20 },
-                { id: 25, name: "Ben", g2g: 60, days: 20 },
-                { id: 26, name: "Luke", g2g: 52, days: 20 },
-                { id: 27, name: "Oscar", g2g: 58, days: 20 },
-                { id: 28, name: "Rachel", g2g: 53, days: 20 },
-                { id: 29, name: "David", g2g: 54, days: 20 }
+                { id: 23, name: "Melaine", g2g: 50, days: 20 },
+                { id: 24, name: "Liz", g2g: 50, days: 20 },
+                { id: 25, name: "Ben", g2g: 50, days: 20 },
+                { id: 26, name: "Luke", g2g: 50, days: 20 },
+                { id: 27, name: "Oscar", g2g: 50, days: 20 },
+                { id: 28, name: "Rachel", g2g: 50, days: 20 },
+                { id: 29, name: "David", g2g: 50, days: 20 }
             ]
         }
     ];
@@ -313,13 +312,13 @@
     function getTeamStatus(teamName, ratio) {
         if (teamName === "Wazowski" || teamName === "Bloom" || teamName === "Pgx") {
             if (ratio >= 1.2) return `<span class="badge tier3">Tier 3 Qualified</span>`;
-            if (ratio >= 1.0) return `<span class="badge tier2">Tier 2 Qualified (Missing ${(1.2 - ratio).toFixed(2)})</span>`;
-            if (ratio >= 0.85) return `<span class="badge tier1">Tier 1 Qualified (Missing ${(1.0 - ratio).toFixed(2)})</span>`;
-            return `<span class="badge not-qualified">Not Qualified (Missing ${(0.85 - ratio).toFixed(2)})</span>`;
+            if (ratio >= 1.0) return `<span class="badge tier2">Tier 2 Qualified (Missing ${(1.2 - ratio).toFixed(2)} for Tier 3)</span>`;
+            if (ratio >= 0.85) return `<span class="badge tier1">Tier 1 Qualified (Missing ${(1.0 - ratio).toFixed(2)} for Tier 2)</span>`;
+            return `<span class="badge not-qualified">Not Qualified (Missing ${(0.85 - ratio).toFixed(2)} for Tier 1)</span>`;
         } else if (teamName === "Logistics") {
             if (ratio >= 3.0) return `<span class="badge tier2">Tier 2 Qualified</span>`;
-            if (ratio >= 2.5) return `<span class="badge tier1">Tier 1 Qualified (Missing ${(3.0 - ratio).toFixed(2)})</span>`;
-            return `<span class="badge not-qualified">Not Qualified (Missing ${(2.5 - ratio).toFixed(2)})</span>`;
+            if (ratio >= 2.5) return `<span class="badge tier1">Tier 1 Qualified (Missing ${(3.0 - ratio).toFixed(2)} for Tier 2)</span>`;
+            return `<span class="badge not-qualified">Not Qualified (Missing ${(2.5 - ratio).toFixed(2)} for Tier 1)</span>`;
         }
         return "N/A";
     }
@@ -375,3 +374,12 @@
             dbTeams.forEach(team => {
                 team.agents = team.agents.filter(a => a.id !== agentId);
             });
+            renderAll();
+        }
+    }
+
+    renderAll();
+</script>
+
+</body>
+</html>
