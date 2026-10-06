@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GGO - Team Leaders Commissions CRM (Google Sheets Live)</title>
+    <title>GGO - Team Leaders Commissions CRM (October Live)</title>
     
     <style>
         :root {
@@ -20,7 +20,7 @@
         .container { max-width: 1400px; margin: 0 auto; }
         
         .navbar { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 12px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 24px; }
-        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px; color: white; }
+        .logo-area { font-weight: bold; font-size: 20px; color: white; }
         .nav-links a { text-decoration: none; color: white; background: var(--btn-active); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; }
 
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -44,63 +44,75 @@
 
         .badge { padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
         .tier3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .tier2 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .tier1 { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
         .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="navbar">
-        <div class="logo-area">
-            <span>GGO CRM - Google Sheets Live Sync</span>
-        </div>
-        <div class="nav-links">
-            <a href="#" onclick="fetchSheetData(); return false;">Refresh Data</a>
-        </div>
+        <div class="logo-area">GGO CRM - October Data (Live Sync)</div>
+        <div class="nav-links"><a href="#" onclick="fetchSheetData(); return false;">Refresh October Data</a></div>
     </div>
 
     <div class="page-header">
-        <div class="page-title">
-            <span>|</span> Team Leaders Commission Tracker (Sourced from Google Sheet API)
-        </div>
+        <div class="page-title"><span>|</span> October Payroll Cycle & Teams Performance</div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="title">TOTAL AGENTS</div>
-            <div class="value" id="totalAgentsCount">0</div>
+            <div class="title">TOTAL TEAMS</div>
+            <div class="value" id="totalTeamsCount">0</div>
         </div>
         <div class="stat-card">
-            <div class="title">TOTAL G2G'S</div>
-            <div class="value" id="totalG2GCount">0</div>
+            <div class="title">TEAMS QUALIFIED (ACHIEVED)</div>
+            <div class="value" id="qualifiedTeamsCount">0</div>
         </div>
         <div class="stat-card">
-            <div class="title">TOTAL ATTENDED DAYS</div>
-            <div class="value" id="totalDaysCount">0</div>
+            <div class="title">TEAMS BELOW TARGET</div>
+            <div class="value" id="belowTeamsCount">0</div>
         </div>
     </div>
 
     <div class="filters-bar">
+        <select id="filterTeam" onchange="renderData()">
+            <option value="">All Teams / Sections</option>
+        </select>
         <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderData()" style="max-width: 250px;">
     </div>
 
     <div class="table-container">
-        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Agents Performance (Live from Google Sheet)</h3>
+        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Teams Summary (October)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Team / Section Name</th>
+                    <th>Total G2G'S</th>
+                    <th>Total Attended Days</th>
+                    <th>Average Ratio</th>
+                    <th>Target Status</th>
+                </tr>
+            </thead>
+            <tbody id="teamsTableBody">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading October data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-container">
+        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Agents Detailed List (October)</h3>
         <table>
             <thead>
                 <tr>
                     <th>Agent Name</th>
+                    <th>Section / Team</th>
                     <th>Total G2G'S</th>
                     <th>Attended Days</th>
                     <th>Agent Ratio</th>
-                    <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="sheetTableBody">
-                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading data from Google Sheet...</td></tr>
+            <tbody id="agentsTableBody">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -108,60 +120,122 @@
 
 <script>
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyGCD4UHc1Ivy-PMZiDsYLUA61CO_3MUA22N3cIZDSGYMhVFNefpx1I4eOJuCN6LRARIg/exec";
-    let sheetData = [];
+    let rawData = [];
+    let teamsMap = {};
 
     async function fetchSheetData() {
         try {
-            document.getElementById("sheetTableBody").innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Fetching live data...</td></tr>`;
             let response = await fetch(scriptUrl);
-            sheetData = await response.json();
-            renderData();
+            rawData = await response.json();
+            processTeamsData();
         } catch (error) {
-            console.error("Error fetching Google Sheet data:", error);
-            document.getElementById("sheetTableBody").innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f87171;">Failed to load data. Make sure deployment is set to 'Anyone'.</td></tr>`;
+            console.error("Error:", error);
+            document.getElementById("teamsTableBody").innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f87171;">Failed to load October tab.</td></tr>`;
         }
     }
 
-    function renderData() {
-        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
-        const tbody = document.getElementById("sheetTableBody");
-        tbody.innerHTML = "";
-
-        let totalG2GSum = 0;
-        let totalDaysSum = 0;
-        let validAgentsCount = 0;
-
-        sheetData.forEach(row => {
-            let agentName = row["AGENT NAME"] || row["Agent Name"] || "";
-            // Skip empty rows or section headers like ORT, CGM
-            if (!agentName || agentName === "ORT" || agentName === "CGM" || agentName.includes("Number of agents")) return;
-
-            if (agentName.toLowerCase().includes(searchQuery)) {
-                let g2g = parseFloat(row["Total G2G'S"] || row["Total G2G's"] || 0);
-                let days = parseFloat(row["Attended Days"] || 0);
-                let ratio = days > 0 ? (g2g / days).toFixed(2) : 0;
-
-                totalG2GSum += g2g;
-                totalDaysSum += days;
-                validAgentsCount++;
-
-                let htmlRow = `<tr>
-                    <td><b>${agentName}</b></td>
-                    <td><b style="color: var(--accent-blue);">${g2g}</b></td>
-                    <td>${days}</td>
-                    <td><b>${ratio}</b></td>
-                    <td><span class="status-active">Active</span></td>
-                </tr>`;
-                tbody.innerHTML += htmlRow;
+    function processTeamsData() {
+        teamsMap = {};
+        let currentTeam = "General";
+        
+        rawData.forEach(row => {
+            let name = row["AGENT NAME"] || row["Agent Name"] || "";
+            // لو السطر ده عبارة عن اسم التيم (زي ORT أو CGM في الشيت)
+            if (name && (name === "ORT" || name === "CGM" || (!row["Total G2G'S"] && !row["Attended Days"] && name.length < 15))) {
+                currentTeam = name.trim();
+                if (!teamsMap[currentTeam]) teamsMap[currentTeam] = [];
+                return;
             }
+
+            if (!name || name.includes("Number of agents")) return;
+
+            let g2g = parseFloat(row["Total G2G'S"] || row["Total G2G's"] || 0);
+            let days = parseFloat(row["Attended Days"] || 0);
+
+            if (!teamsMap[currentTeam]) {
+                teamsMap[currentTeam] = [];
+            }
+
+            teamsMap[currentTeam].push({
+                name: name,
+                g2g: g2g,
+                days: days
+            });
         });
 
-        document.getElementById("totalAgentsCount").innerText = validAgentsCount;
-        document.getElementById("totalG2GCount").innerText = totalG2GSum;
-        document.getElementById("totalDaysCount").innerText = totalDaysSum;
+        updateTeamFilterDropdown();
+        renderData();
     }
 
-    // Initial fetch
+    function updateTeamFilterDropdown() {
+        let select = document.getElementById("filterTeam");
+        select.innerHTML = '<option value="">All Teams / Sections</option>';
+        Object.keys(teamsMap).forEach(team => {
+            if (teamsMap[team].length > 0) {
+                select.innerHTML += `<option value="${team}">${team}</option>`;
+            }
+        });
+    }
+
+    function renderData() {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
+        
+        let teamsTbody = document.getElementById("teamsTableBody");
+        let agentsTbody = document.getElementById("agentsTableBody");
+        teamsTbody.innerHTML = "";
+        agentsTbody.innerHTML = "";
+
+        let qualifiedCount = 0;
+        let belowCount = 0;
+        let totalTeams = 0;
+
+        Object.keys(teamsMap).forEach(teamName => {
+            if (selectedFilter && teamName !== selectedFilter) return;
+            let agents = teamsMap[teamName];
+            if (agents.length === 0) return;
+
+            totalTeams++;
+            let teamG2G = agents.reduce((sum, a) => sum + a.g2g, 0);
+            let teamDays = agents.reduce((sum, a) => sum + a.days, 0);
+            let teamRatio = teamDays > 0 ? (teamG2G / teamDays).toFixed(2) : 0;
+            let numericRatio = parseFloat(teamRatio);
+
+            // افتراض شرط التحقيق (مثلاً Ratio >= 1.0 أو حسب تيماتك)
+            let isAchieved = numericRatio >= 1.0; 
+            if (isAchieved) qualifiedCount++; else belowCount++;
+
+            let statusHtml = isAchieved 
+                ? `<span class="badge tier3">Achieved (Qualified)</span>` 
+                : `<span class="badge not-qualified">Below Target</span>`;
+
+            teamsTbody.innerHTML += `<tr>
+                <td><b>${teamName}</b></td>
+                <td>${teamG2G}</td>
+                <td>${teamDays}</td>
+                <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
+                <td>${statusHtml}</td>
+            </tr>`;
+
+            agents.forEach(agent => {
+                if (agent.name.toLowerCase().includes(searchQuery)) {
+                    let agentRatio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+                    agentsTbody.innerHTML += `<tr>
+                        <td><b>${agent.name}</b></td>
+                        <td>${teamName}</td>
+                        <td>${agent.g2g}</td>
+                        <td>${agent.days}</td>
+                        <td><b style="color: var(--accent-blue);">${agentRatio}</b></td>
+                    </tr>`;
+                }
+            });
+        });
+
+        document.getElementById("totalTeamsCount").innerText = totalTeams;
+        document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
+        document.getElementById("belowTeamsCount").innerText = belowCount;
+    }
+
     fetchSheetData();
 </script>
 
