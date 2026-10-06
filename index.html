@@ -42,6 +42,7 @@
         th { background-color: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
         tr:hover { background-color: rgba(255,255,255,0.02); }
 
+        .editable-input { width: 70px; padding: 6px; background: #080e21; border: 1px solid var(--border-color); color: var(--accent-blue); font-weight: bold; border-radius: 4px; text-align: center; }
         .badge { padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
         .tier3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
         .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
@@ -52,7 +53,7 @@
 <div class="container">
     <div class="navbar">
         <div class="logo-area">GGO CRM - October Teams Sync</div>
-        <div class="nav-links"><a href="#" onclick="fetchSheetData(); return false;">Refresh October Data</a></div>
+        <div class="nav-links"><a href="#" onclick="fetchSheetData(); return false;">Refresh Data</a></div>
     </div>
 
     <div class="page-header">
@@ -79,7 +80,7 @@
             <option value="">All Teams</option>
             <option value="Wazowski">Wazowski (TL: Mavis Miller)</option>
             <option value="Bloom">Bloom (TL: Donna Bell)</option>
-            <option value="Pgx">Pgx (TL: Jordan Kelly)</option>
+            <option value="PGX">PGX (TL: Jordan Kelly)</option>
             <option value="Logistics">Logistics (TL: Joey Millner)</option>
         </select>
         <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderData()" style="max-width: 250px;">
@@ -126,20 +127,41 @@
 <script>
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyGCD4UHc1Ivy-PMZiDsYLUA61CO_3MUA22N3cIZDSGYMhVFNefpx1I4eOJuCN6LRARIg/exec";
     
-    // تعريف الأجينتس وتوزيعهم الثابت على التيمات بناءً على رغبتك
-    const teamMapping = {
-        "Wazowski": { leader: "Mavis Miller", agents: ["Victor Collins", "Adam Smith", "Mia Cooper", "Jessy Moore", "Amy Jonson"] },
-        "Bloom": { leader: "Donna Bell", agents: ["Celine Dami", "Kim Collins", "Heaven Davis", "Jules Brown", "Anna Nelson", "Jennifer Adams", "Katherine Adams", "Eric Dean", "Roben Neves"] },
-        "Pgx": { leader: "Jordan Kelly", agents: [] }, // أضيفي أسامي أجينتس Pgx هنا لو حابة
-        "Logistics": { leader: "Joey Millner", agents: [] } // أضيفي أسامي أجينتس Logistics هنا لو حابة
+    // الهيكل الثابت للتيمات والأسامي اللي طلبتيها بالترتيب
+    const teamsStructure = {
+        "Wazowski": {
+            leader: "Mavis Miller",
+            agents: ["Victor Collins", "Adam Smith", "Mia Cooper", "Jessy Moore", "Amy Jonson"]
+        },
+        "Bloom": {
+            leader: "Donna Bell",
+            agents: ["Celine Dami", "Kim Collins", "Heaven Davis", "Maddy Snow", "Jules Brown", "Anna Nelson", "Jennifer Adams", "Katherine Adams", "Eric Dean", "Roben Neves"]
+        },
+        "PGX": {
+            leader: "Jordan Kelly",
+            agents: ["Stewart Martin", "Michael Morgan", "Jeremy Welson", "Diana Smith", "Hannah vance", "camila johns", "caitlyn adam", "Owen willson"]
+        },
+        "Logistics": {
+            leader: "Joey Millner",
+            agents: [
+                { name: "Marcy miller", g2g: 50, days: 20 },
+                { name: "liz fox", g2g: 50, days: 20 },
+                { name: "Melaine Brown", g2g: 50, days: 20 },
+                { name: "Ben Camel", g2g: 50, days: 20 },
+                { name: "Oscar Camel", g2g: 50, days: 20 },
+                { name: "David Green", g2g: 50, days: 20 },
+                { name: "Luke Grant", g2g: 50, days: 20 },
+                { name: "Rachel Adams", g2g: 50, days: 20 }
+            ]
+        }
     };
 
-    let rawData = [];
+    let sheetRawData = [];
 
     async function fetchSheetData() {
         try {
             let response = await fetch(scriptUrl);
-            rawData = await response.json();
+            sheetRawData = await response.json();
             renderData();
         } catch (error) {
             console.error("Error:", error);
@@ -158,41 +180,47 @@
 
         let qualifiedCount = 0;
         let belowCount = 0;
-        let teamsList = ["Wazowski", "Bloom", "Pgx", "Logistics"];
+        let teamKeys = Object.keys(teamsStructure);
 
-        teamsList.forEach(teamName => {
+        teamKeys.forEach(teamName => {
             if (selectedFilter && teamName !== selectedFilter) return;
 
-            let config = teamMapping[teamName];
+            let teamInfo = teamsStructure[teamName];
             let teamG2G = 0;
             let teamDays = 0;
-            let teamAgentsData = [];
+            let processedAgents = [];
 
-            // البحث عن الأجينتس التابعين لهذا التيم داخل بيانات الشيت القادمة من أكتوبر
-            rawData.forEach(row => {
-                let name = row["AGENT NAME"] || row["Agent Name"] || "";
-                if (!name || name.includes("Number of agents")) return;
+            if (teamName === "Logistics") {
+                // تيم لوجستيكس يدوي زي ما طلبتي
+                teamInfo.agents.forEach(ag => {
+                    teamG2G += ag.g2g;
+                    teamDays += ag.days;
+                    processedAgents.push({ name: ag.name, g2g: ag.g2g, days: ag.days });
+                });
+            } else {
+                // باقي التيمات تسحب أرقامها من الشيت بالمطابقة بالاسم
+                teamInfo.agents.forEach(agentName => {
+                    let foundRow = sheetRawData.find(row => {
+                        let rName = row["AGENT NAME"] || row["Agent Name"] || "";
+                        return rName.trim().toLowerCase() === agentName.trim().toLowerCase();
+                    });
 
-                // لو الأجينت موجود في لستة التيم ده في الكود أو في الشيت تحت القسم الخاص بيه
-                let isMatch = config.agents.some(a => a.toLowerCase() === name.toLowerCase());
-                
-                // لو مفيش أجينتس محددين لـ Pgx أو Logistics في الكود، نقدر نقسمهم بالترتيب أو حسب الجدول
-                if (isMatch || config.agents.length === 0) {
-                    let g2g = parseFloat(row["Total G2G'S"] || row["Total G2G's"] || 0);
-                    let days = parseFloat(row["Attended Days"] || 0);
+                    let g2g = foundRow ? parseFloat(foundRow["Total G2G'S"] || foundRow["Total G2G's"] || 0) : 0;
+                    let days = foundRow ? parseFloat(foundRow["Attended Days"] || 0) : 0;
 
-                    // لو التيم فاضي في الكود، هناخد أول كم أجينت كمثال لحد ما تحدديهم، أو حسب اسم الأجينت
                     teamG2G += g2g;
                     teamDays += days;
-                    teamAgentsData.push({ name: name, g2g: g2g, days: days });
-                }
-            });
+                    processedAgents.push({ name: agentName, g2g: g2g, days: days });
+                });
+            }
 
             let teamRatio = teamDays > 0 ? (teamG2G / teamDays).toFixed(2) : 0;
             let numericRatio = parseFloat(teamRatio);
             
-            // شرط التحقيق لكل تيم (مثلاً Ratio >= 0.85 أو حسب تارجتكم)
-            let isAchieved = numericRatio >= 0.85;
+            // شرط التارجت (مثلا لو التيمات الكبيرة تارجتها 0.85 أو أكثر)
+            let targetThreshold = (teamName === "Logistics") ? 2.5 : 0.85;
+            let isAchieved = numericRatio >= targetThreshold;
+            
             if (isAchieved) qualifiedCount++; else belowCount++;
 
             let statusHtml = isAchieved 
@@ -201,14 +229,14 @@
 
             teamsTbody.innerHTML += `<tr>
                 <td><b>${teamName}</b></td>
-                <td>${config.leader}</td>
+                <td>${teamInfo.leader}</td>
                 <td>${teamG2G}</td>
                 <td>${teamDays}</td>
                 <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
                 <td>${statusHtml}</td>
             </tr>`;
 
-            teamAgentsData.forEach(agent => {
+            processedAgents.forEach(agent => {
                 if (agent.name.toLowerCase().includes(searchQuery)) {
                     let agentRatio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
                     agentsTbody.innerHTML += `<tr>
@@ -224,7 +252,7 @@
 
         document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
         document.getElementById("belowTeamsCount").innerText = belowCount;
-        document.getElementById("totalTeamsCount").innerText = teamsList.length;
+        document.getElementById("totalTeamsCount").innerText = teamKeys.length;
     }
 
     fetchSheetData();
