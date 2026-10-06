@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GGO - Team Leaders Commissions CRM</title>
+    <title>GGO - Team Leaders Commissions CRM (Google Sheets Live)</title>
     
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
     <style>
         :root {
             --bg-dark: #0b1329;
@@ -25,8 +21,7 @@
         
         .navbar { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 12px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 24px; }
         .logo-area { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px; color: white; }
-        .logo-area img { height: 40px; max-width: 160px; object-fit: contain; }
-        .nav-links a { text-decoration: none; color: white; background: var(--btn-active); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+        .nav-links a { text-decoration: none; color: white; background: var(--btn-active); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; }
 
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .page-title { font-size: 16px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
@@ -44,14 +39,8 @@
         .table-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; overflow-x: auto; margin-bottom: 24px; }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: left; }
         th, td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; vertical-align: middle; }
-        th { background-color: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+        th { background-color: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
         tr:hover { background-color: rgba(255,255,255,0.02); }
-
-        .editable-input { width: 70px; padding: 6px 8px; background: #080e21; border: 1px solid var(--border-color); color: var(--accent-blue); font-weight: bold; border-radius: 6px; text-align: center; }
-        .editable-input:focus { border-color: var(--accent-blue); background: #111c38; }
-        .editable-text { background: transparent; border: none; color: white; font-weight: bold; font-size: 13px; width: 130px; padding: 6px; border-radius: 4px; }
-        .editable-text:focus { background: #080e21; border: 1px solid var(--border-color); outline: none; }
-        .editable-select { background: #080e21; color: white; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; font-size: 12px; }
 
         .badge { padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
         .tier3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
@@ -59,14 +48,7 @@
         .tier1 { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
         .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .btn-delete:hover { background: #dc2626; }
-
-        .form-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; margin-bottom: 24px; }
-        .form-box h3 { margin-top: 0; color: white; font-size: 16px; margin-bottom: 15px; }
-        .form-grid { display: flex; gap: 12px; flex-wrap: wrap; }
-        .form-grid input, .form-grid select { flex: 1; min-width: 160px; }
-        .btn-green { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .status-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -74,27 +56,26 @@
 <div class="container">
     <div class="navbar">
         <div class="logo-area">
-            <img src="GGO-White-Var3 (1).png" alt="Company Logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
-            <span id="fallback-logo" style="display:none;">GGO CRM</span>
+            <span>GGO CRM - Google Sheets Sync</span>
         </div>
         <div class="nav-links">
-            <a href="#">Commissions Dashboard & Teams (Live Sync)</a>
+            <a href="#">Live from Google Sheets</a>
         </div>
     </div>
 
     <div class="page-header">
         <div class="page-title">
-            <span>|</span> Team Leaders Commission Tracker (Payroll Cycle: 28th to 27th)
+            <span>|</span> Team Leaders Commission Tracker (Sourced from Google Sheet)
         </div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
             <div class="title">TOTAL TEAMS</div>
-            <div class="value" id="totalTeamsCount">4</div>
+            <div class="value" id="totalTeamsCount">0</div>
         </div>
         <div class="stat-card">
-            <div class="title">TEAMS QUALIFIED (ACHIEVED)</div>
+            <div class="title">TEAMS QUALIFIED</div>
             <div class="value" id="qualifiedTeamsCount">0</div>
         </div>
         <div class="stat-card">
@@ -104,344 +85,43 @@
     </div>
 
     <div class="filters-bar">
-        <select id="filterTeam" onchange="renderAll()">
-            <option value="">All Teams</option>
-            <option value="Wazowski">Wazowski (TL: Mavis Miller)</option>
-            <option value="Bloom">Bloom (TL: Donna Bell)</option>
-            <option value="Pgx">Pgx (TL: Jordan Kelly)</option>
-            <option value="Logistics">Logistics (TL: Joey Millner)</option>
-        </select>
-        <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderAll()" style="max-width: 250px;">
+        <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderData()" style="max-width: 250px;">
     </div>
 
     <div class="table-container">
-        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Team Leaders Performance Overview</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Team Name</th>
-                    <th>Team Leader</th>
-                    <th>Total Team G2G's</th>
-                    <th>Total Attended Days</th>
-                    <th>Team Average Ratio</th>
-                    <th>Status & Tiers</th>
-                </tr>
-            </thead>
-            <tbody id="teamTableBody">
-                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading data...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="form-box">
-        <h3>Add New Agent to Team</h3>
-        <div class="form-grid">
-            <input type="text" id="newAgentName" placeholder="Agent Full Name">
-            <select id="newAgentTeam">
-                <option value="Wazowski">Wazowski</option>
-                <option value="Bloom">Bloom</option>
-                <option value="Pgx">Pgx</option>
-                <option value="Logistics">Logistics</option>
-            </select>
-            <input type="number" id="newAgentG2G" placeholder="Initial G2G Sales">
-            <input type="number" id="newAgentDays" placeholder="Attended Days">
-            <select id="newAgentStatus">
-                <option value="Active">Active</option>
-                <option value="Resigned">Resigned</option>
-                <option value="Terminated">Terminated</option>
-                <option value="On Probation">On Probation</option>
-            </select>
-            <button class="btn-green" onclick="addNewAgent()">Add Agent</button>
-        </div>
-    </div>
-
-    <div class="table-container">
-        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Agents Direct Edit Panel (Live Sync)</h3>
+        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Agents Performance (Loaded from Google Sheet)</h3>
         <table>
             <thead>
                 <tr>
                     <th>Agent Name</th>
-                    <th>Team</th>
-                    <th>G2G Sales</th>
+                    <th>Total G2G'S</th>
                     <th>Attended Days</th>
                     <th>Agent Ratio</th>
                     <th>Status</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="agentsTableBody">
-                <!-- Loaded via Firebase -->
+            <tbody id="sheetTableBody">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading data from Google Sheet...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCd2Bxzkh3nvsQNRMmFeiiy1q1BtTs-bew",
-        authDomain: "ggo-commissions.firebaseapp.com",
-        databaseURL: "https://ggo-commissions-default-rtdb.firebaseio.com",
-        projectId: "ggo-commissions",
-        storageBucket: "ggo-commissions.firebasestorage.app",
-        messagingSenderId: "578545311711",
-        appId: "1:578545311711:web:d3763b33a1872910fd6e6a",
-        measurementId: "G-EWQ711WFSW"
-    };
+    const sheetApiUrl = "https://sheetdb.io/api/v1/51fqt99ra08x1";
+    let sheetData = [];
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let dbTeams = [];
-
-    const defaultTeams = [
-        {
-            teamName: "Wazowski",
-            leader: "Mavis Miller",
-            agents: [
-                { id: 1, name: "Adam", g2g: 20, days: 20, status: "Active" },
-                { id: 2, name: "Victor", g2g: 20, days: 20, status: "Active" },
-                { id: 3, name: "Mia", g2g: 20, days: 20, status: "Active" },
-                { id: 4, name: "Jessy", g2g: 20, days: 20, status: "Active" },
-                { id: 5, name: "Amy", g2g: 20, days: 20, status: "Active" }
-            ]
-        },
-        {
-            teamName: "Bloom",
-            leader: "Donna Bell",
-            agents: [
-                { id: 6, name: "Anna", g2g: 20, days: 20, status: "Active" },
-                { id: 7, name: "Heaven", g2g: 20, days: 20, status: "Active" },
-                { id: 8, name: "Celine", g2g: 20, days: 20, status: "Active" },
-                { id: 9, name: "Jules", g2g: 20, days: 20, status: "Active" },
-                { id: 10, name: "Kim", g2g: 20, days: 20, status: "Active" },
-                { id: 11, name: "Jennifer", g2g: 20, days: 20, status: "Active" },
-                { id: 12, name: "Eric", g2g: 20, days: 20, status: "Active" },
-                { id: 13, name: "Roben", g2g: 20, days: 20, status: "Active" }
-            ]
-        },
-        {
-            teamName: "Pgx",
-            leader: "Jordan Kelly",
-            agents: [
-                { id: 14, name: "Stewart", g2g: 20, days: 20, status: "Active" },
-                { id: 15, name: "Micheal", g2g: 20, days: 20, status: "Active" },
-                { id: 16, name: "Jeremy", g2g: 20, days: 20, status: "Active" },
-                { id: 17, name: "Diana", g2g: 20, days: 20, status: "Active" },
-                { id: 18, name: "Hannah", g2g: 20, days: 20, status: "Active" },
-                { id: 19, name: "Camila", g2g: 20, days: 20, status: "Active" },
-                { id: 20, name: "Catilyn", g2g: 20, days: 20, status: "Active" },
-                { id: 21, name: "Owen", g2g: 20, days: 20, status: "Active" }
-            ]
-        },
-        {
-            teamName: "Logistics",
-            leader: "Joey Millner",
-            agents: [
-                { id: 22, name: "Marcy", g2g: 50, days: 20, status: "Active" },
-                { id: 23, name: "Melaine", g2g: 50, days: 20, status: "Active" },
-                { id: 24, name: "Liz", g2g: 50, days: 20, status: "Active" },
-                { id: 25, name: "Ben", g2g: 50, days: 20, status: "Active" },
-                { id: 26, name: "Luke", g2g: 50, days: 20, status: "Active" },
-                { id: 27, name: "Oscar", g2g: 50, days: 20, status: "Active" },
-                { id: 28, name: "Rachel", g2g: 50, days: 20, status: "Active" },
-                { id: 29, name: "David", g2g: 50, days: 20, status: "Active" }
-            ]
+    async function fetchSheetData() {
+        try {
+            let response = await fetch(sheetApiUrl);
+            sheetData = await response.json();
+            renderData();
+        } catch (error) {
+            console.error("Error fetching Google Sheet data:", error);
+            document.getElementById("sheetTableBody").innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f87171;">Failed to load data from Google Sheet.</td></tr>`;
         }
-    ];
-
-    // Using a fresh path 'ggo_v3' so it creates a clean database automatically
-    db.ref('ggo_v3').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            dbTeams = data;
-        } else {
-            db.ref('ggo_v3').set(defaultTeams);
-            dbTeams = defaultTeams;
-        }
-        renderAll();
-    });
-
-    function saveDataToFirebase() {
-        db.ref('ggo_v3').set(dbTeams);
     }
 
-    function renderAll() {
-        renderTeamsSummary();
-        renderAgentsTable();
-    }
-
-    function renderTeamsSummary() {
-        const selectedFilter = document.getElementById("filterTeam").value;
-        const teamTableBody = document.getElementById("teamTableBody");
-        teamTableBody.innerHTML = "";
-
-        let qualifiedCount = 0;
-        let belowCount = 0;
-
-        let filteredTeams = dbTeams.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
-
-        filteredTeams.forEach(team => {
-            let agentsList = team.agents || [];
-            let totalG2G = agentsList.reduce((sum, a) => sum + (parseFloat(a.g2g) || 0), 0);
-            let totalDays = agentsList.reduce((sum, a) => sum + (parseFloat(a.days) || 0), 0);
-            let teamRatio = totalDays > 0 ? (totalG2G / totalDays).toFixed(2) : 0;
-            let numericRatio = parseFloat(teamRatio);
-
-            let statusHtml = getTeamStatus(team.teamName, numericRatio);
-
-            if ((team.teamName !== "Logistics" && numericRatio >= 0.85) || (team.teamName === "Logistics" && numericRatio >= 2.5)) {
-                qualifiedCount++;
-            } else {
-                belowCount++;
-            }
-
-            let row = `<tr>
-                <td><b>${team.teamName}</b></td>
-                <td>${team.leader}</td>
-                <td>${totalG2G}</td>
-                <td>${totalDays}</td>
-                <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
-                <td>${statusHtml}</td>
-            </tr>`;
-            teamTableBody.innerHTML += row;
-        });
-
-        document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
-        document.getElementById("belowTeamsCount").innerText = belowCount;
-        document.getElementById("totalTeamsCount").innerText = dbTeams.length;
-    }
-
-    function renderAgentsTable() {
-        const selectedFilter = document.getElementById("filterTeam").value;
+    function renderData() {
         const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
-        const agentsTableBody = document.getElementById("agentsTableBody");
-        agentsTableBody.innerHTML = "";
-
-        dbTeams.forEach(team => {
-            if (selectedFilter === "" || team.teamName === selectedFilter) {
-                let agentsList = team.agents || [];
-                agentsList.forEach(agent => {
-                    if (agent.name.toLowerCase().includes(searchQuery)) {
-                        let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
-                        let row = `<tr>
-                            <td><input type="text" class="editable-text" value="${agent.name}" onchange="updateAgentField(${agent.id}, 'name', this.value)"></td>
-                            <td>
-                                <select class="editable-select" onchange="moveAgentTeam(${agent.id}, this.value)">
-                                    <option value="Wazowski" ${team.teamName === 'Wazowski' ? 'selected' : ''}>Wazowski</option>
-                                    <option value="Bloom" ${team.teamName === 'Bloom' ? 'selected' : ''}>Bloom</option>
-                                    <option value="Pgx" ${team.teamName === 'Pgx' ? 'selected' : ''}>Pgx</option>
-                                    <option value="Logistics" ${team.teamName === 'Logistics' ? 'selected' : ''}>Logistics</option>
-                                </select>
-                            </td>
-                            <td><input type="number" class="editable-input" value="${agent.g2g}" onchange="updateAgentField(${agent.id}, 'g2g', this.value)"></td>
-                            <td><input type="number" class="editable-input" value="${agent.days}" onchange="updateAgentField(${agent.id}, 'days', this.value)"></td>
-                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
-                            <td>
-                                <select class="editable-select" onchange="updateAgentField(${agent.id}, 'status', this.value)">
-                                    <option value="Active" ${agent.status === 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Resigned" ${agent.status === 'Resigned' ? 'selected' : ''}>Resigned</option>
-                                    <option value="Terminated" ${agent.status === 'Terminated' ? 'selected' : ''}>Terminated</option>
-                                    <option value="On Probation" ${agent.status === 'On Probation' ? 'selected' : ''}>On Probation</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
-                            </td>
-                        </tr>`;
-                        agentsTableBody.innerHTML += row;
-                    }
-                });
-            }
-        });
-    }
-
-    function getTeamStatus(teamName, ratio) {
-        if (teamName === "Wazowski" || teamName === "Bloom" || teamName === "Pgx") {
-            if (ratio >= 1.2) return `<span class="badge tier3">Tier 3 Qualified</span>`;
-            if (ratio >= 1.0) return `<span class="badge tier2">Tier 2 Qualified (Missing ${(1.2 - ratio).toFixed(2)} for Tier 3)</span>`;
-            if (ratio >= 0.85) return `<span class="badge tier1">Tier 1 Qualified (Missing ${(1.0 - ratio).toFixed(2)} for Tier 2)</span>`;
-            return `<span class="badge not-qualified">Not Qualified (Missing ${(0.85 - ratio).toFixed(2)} for Tier 1)</span>`;
-        } else if (teamName === "Logistics") {
-            if (ratio >= 3.0) return `<span class="badge tier2">Tier 2 Qualified</span>`;
-            if (ratio >= 2.5) return `<span class="badge tier1">Tier 1 Qualified (Missing ${(3.0 - ratio).toFixed(2)} for Tier 2)</span>`;
-            return `<span class="badge not-qualified">Not Qualified (Missing ${(2.5 - ratio).toFixed(2)} for Tier 1)</span>`;
-        }
-        return "N/A";
-    }
-
-    function updateAgentField(agentId, field, value) {
-        dbTeams.forEach(team => {
-            if (team.agents) {
-                let agent = team.agents.find(a => a.id === agentId);
-                if (agent) {
-                    if (field === 'g2g' || field === 'days') {
-                        agent[field] = parseFloat(value) || 0;
-                    } else {
-                        agent[field] = value.trim();
-                    }
-                    saveDataToFirebase();
-                }
-            }
-        });
-    }
-
-    function moveAgentTeam(agentId, newTeamName) {
-        let targetAgent = null;
-        dbTeams.forEach(team => {
-            if (team.agents) {
-                let idx = team.agents.findIndex(a => a.id === agentId);
-                if (idx !== -1) {
-                    targetAgent = team.agents[idx];
-                    team.agents.splice(idx, 1);
-                }
-            }
-        });
-
-        if (targetAgent) {
-            let destTeam = dbTeams.find(t => t.teamName === newTeamName);
-            if (destTeam) {
-                if (!destTeam.agents) destTeam.agents = [];
-                destTeam.agents.push(targetAgent);
-                saveDataToFirebase();
-            }
-        }
-    }
-
-    function addNewAgent() {
-        let name = document.getElementById("newAgentName").value.trim();
-        let teamName = document.getElementById("newAgentTeam").value;
-        let g2g = parseFloat(document.getElementById("newAgentG2G").value);
-        let days = parseFloat(document.getElementById("newAgentDays").value);
-        let status = document.getElementById("newAgentStatus").value;
-
-        if (!name || isNaN(g2g) || isNaN(days)) {
-            alert("Please fill in all agent fields correctly!");
-            return;
-        }
-
-        let team = dbTeams.find(t => t.teamName === teamName);
-        if (team) {
-            if (!team.agents) team.agents = [];
-            let newId = Date.now();
-            team.agents.push({ id: newId, name, g2g, days, status });
-            saveDataToFirebase();
-            document.getElementById("newAgentName").value = "";
-            document.getElementById("newAgentG2G").value = "";
-            document.getElementById("newAgentDays").value = "";
-        }
-    }
-
-    function deleteAgent(agentId) {
-        if (confirm("Are you sure you want to delete this agent?")) {
-            dbTeams.forEach(team => {
-                if (team.agents) {
-                    team.agents = team.agents.filter(a => a.id !== agentId);
-                }
-            });
-            saveDataToFirebase();
-        }
-    }
-</script>
-
-</body>
-</html>
+        const tbody
