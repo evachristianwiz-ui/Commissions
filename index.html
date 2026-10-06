@@ -194,6 +194,7 @@
 
     let dbTeams = [];
 
+    // Full Original Default Teams & Agents Data
     const defaultTeams = [
         {
             teamName: "Wazowski",
@@ -281,51 +282,4 @@
         let filteredTeams = dbTeams.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
 
         filteredTeams.forEach(team => {
-            let agentsList = team.agents || [];
-            let totalG2G = agentsList.reduce((sum, a) => sum + (parseFloat(a.g2g) || 0), 0);
-            let totalDays = agentsList.reduce((sum, a) => sum + (parseFloat(a.days) || 0), 0);
-            let teamRatio = totalDays > 0 ? (totalG2G / totalDays).toFixed(2) : 0;
-            let numericRatio = parseFloat(teamRatio);
-
-            let statusHtml = getTeamStatus(team.teamName, numericRatio);
-
-            if ((team.teamName !== "Logistics" && numericRatio >= 0.85) || (team.teamName === "Logistics" && numericRatio >= 2.5)) {
-                qualifiedCount++;
-            } else {
-                belowCount++;
-            }
-
-            let row = `<tr>
-                <td><b>${team.teamName}</b></td>
-                <td>${team.leader}</td>
-                <td>${totalG2G}</td>
-                <td>${totalDays}</td>
-                <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
-                <td>${statusHtml}</td>
-            </tr>`;
-            teamTableBody.innerHTML += row;
-        });
-
-        document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
-        document.getElementById("belowTeamsCount").innerText = belowCount;
-        document.getElementById("totalTeamsCount").innerText = dbTeams.length;
-    }
-
-    function renderAgentsTable() {
-        const selectedFilter = document.getElementById("filterTeam").value;
-        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
-        const agentsTableBody = document.getElementById("agentsTableBody");
-        agentsTableBody.innerHTML = "";
-
-        dbTeams.forEach(team => {
-            if (selectedFilter === "" || team.teamName === selectedFilter) {
-                let agentsList = team.agents || [];
-                agentsList.forEach(agent => {
-                    if (agent.name.toLowerCase().includes(searchQuery)) {
-                        let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
-                        let row = `<tr>
-                            <td><input type="text" class="editable-text" value="${agent.name}" onchange="updateAgentField(${agent.id}, 'name', this.value)"></td>
-                            <td>
-                                <select class="editable-select" onchange="moveAgentTeam(${agent.id}, this.value)">
-                                    <option value="Wazowski" ${team.teamName === 'Wazowski' ? 'selected' : ''}>Wazowski</option>
-                                    <option value="Bloom
+            let agentsList = team.agents ||
