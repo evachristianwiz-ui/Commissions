@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Center Commission CRM</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; }
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        select, input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
+        th { background-color: #f8f9fa; color: #2c3e50; }
+        .badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block; }
+        .tier3 { background-color: #d4edda; color: #155724; }
+        .tier2 { background-color: #cce5ff; color: #004085; }
+        .tier1 { background-color: #fff3cd; color: #856404; }
+        .not-qualified { background-color: #f8d7da; color: #721c24; }
+        .form-box { background: #fdfdfd; border: 1px solid #e1e1e1; padding: 15px; border-radius: 6px; margin-top: 20px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🎯 Call Center Commission & CRM Dashboard</h2>
+    <p>إدارة أشرطة ومراتب التايرز لفرق (Wazowski, Bloom, PGX, Logistics)</p>
+
+    <!-- Filters -->
+    <div class="filters">
+        <select id="filterTeam" onchange="filterTable()">
+            <option value="">كل الفرق (All Teams)</option>
+            <option value="Wazowski">Wazowski</option>
+            <option value="Bloom">Bloom</option>
+            <option value="Pgx">Pgx</option>
+            <option value="Logistics">Logistics</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <table id="agentTable">
+        <thead>
+            <tr>
+                <th>اسم الأージェنت (Agent Name)</th>
+                <th>الفريق (Team)</th>
+                <th>إجمالي G2G</th>
+                <th>الأيام المحضورة (Attended Days)</th>
+                <th>النسبة (Ratio)</th>
+                <th>الحالة والتاير (Status & Target)</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Data will load here -->
+        </tbody>
+    </table>
+
+    <!-- Add Agent Form -->
+    <div class="form-box">
+        <h3>➕ إضافة أージェنت جديد أو تحديث بيانات</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" id="agentName" placeholder="اسم الأージェنت">
+            <select id="agentTeam">
+                <option value="Wazowski">Wazowski</option>
+                <option value="Bloom">Bloom</option>
+                <option value="Pgx">Pgx</option>
+                <option value="Logistics">Logistics</option>
+            </select>
+            <input type="number" id="agentG2G" placeholder="إجمالي G2G Sales">
+            <input type="number" id="agentDays" placeholder="أيام الحضور (Attended)">
+            <button onclick="addAgent()">إضافة للقائمة</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // بيانات تجريبية مبدئية
+    let agents = [
+        { name: "أحمد محمد", team: "Wazowski", g2g: 28, days: 20 },
+        { name: "سارة خالد", team: "Logistics", g2g: 60, days: 20 },
+        { name: "محمود علي", team: "Bloom", g2g: 15, days: 18 }
+    ];
+
+    function renderTable(dataToDisplay = agents) {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+
+        dataToDisplay.forEach((agent, index) => {
+            let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+            let statusHtml = getStatusAndMissing(agent.team, parseFloat(ratio));
+
+            let row = `<tr>
+                <td>${agent.name}</td>
+                <td>${agent.team}</td>
+                <td>${agent.g2g}</td>
+                <td>${agent.days}</td>
+                <td><b>${ratio}</b></td>
+                <td>${statusHtml}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function getStatusAndMissing(team, ratio) {
+        if (team === "Wazowski" || team === "Bloom" || team === "Pgx") {
+            if (ratio >= 1.2) return `<span class="badge tier3">Tier 3 Qualified! 🟢</span>`;
+            if (ratio >= 1.0) return `<span class="badge tier2">Tier 2 Qualified (ناقص ${(1.2 - ratio).toFixed(2)} للـ Tier 3)</span>`;
+            if (ratio >= 0.85) return `<span class="badge tier1">Tier 1 Qualified (ناقص ${(1.0 - ratio).toFixed(2)} للـ Tier 2)</span>`;
+            return `<span class="badge not-qualified">غير مؤهل (ناقص ${(0.85 - ratio).toFixed(2)} للـ Tier 1)</span>`;
+        } else if (team === "Logistics") {
+            if (ratio >= 3.0) return `<span class="badge tier2">Tier 2 Qualified! 🟢</span>`;
+            if (ratio >= 2.5) return `<span class="badge tier1">Tier 1 Qualified (ناقص ${(3.0 - ratio).toFixed(2)} للـ Tier 2)</span>`;
+            return `<span class="badge not-qualified">غير مؤهل (ناقص ${(2.5 - ratio).toFixed(2)} للـ Tier 1)</span>`;
+        }
+        return "غير محدد";
+    }
+
+    function addAgent() {
+        let name = document.getElementById("agentName").value;
+        let team = document.getElementById("agentTeam").value;
+        let g2g = parseFloat(document.getElementById("agentG2G").value);
+        let days = parseFloat(document.getElementById("agentDays").value);
+
+        if (!name || isNaN(g2g) || isNaN(days)) {
+            alert("من فضلك املأ جميع الحقول بشكل صحيح!");
+            return;
+        }
+
+        agents.push({ name, team, g2g, days });
+        renderTable();
+
+        // تفريغ الحقول بعد الإضافة
+        document.getElementById("agentName").value = "";
+        document.getElementById("agentG2G").value = "";
+        document.getElementById("agentDays").value = "";
+    }
+
+    function filterTable() {
+        let selectedTeam = document.getElementById("filterTeam").value;
+        if (selectedTeam === "") {
+            renderTable(agents);
+        } else {
+            let filtered = agents.filter(a => a.team === selectedTeam);
+            renderTable(filtered);
+        }
+    }
+
+    // تشغيل الجدول لأول مرة
+    renderTable();
+</script>
+
+</body>
+</html>
