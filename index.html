@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GGO Targets & KPIs - Performance Dashboard (Live Cloud Sync)</title>
+    <title>GGO Targets - Performance Dashboard (Live Cloud Sync)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -38,21 +38,16 @@
             padding: 16px 28px; 
             border-radius: 14px; 
             border: 1px solid var(--border-color); 
-            margin-bottom: 25px; 
+            margin-bottom: 30px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         
         .logo-area { display: flex; align-items: center; justify-self: start; }
         .logo-img { height: 38px; width: auto; object-fit: contain; border-radius: 6px; }
         .navbar-title { font-weight: 700; font-size: 22px; color: white; justify-self: center; }
-        
-        .nav-tabs-area { display: flex; gap: 10px; justify-self: end; }
-        .nav-tab-btn { background: #070b19; color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .nav-tab-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
-
         .nav-badge { background: rgba(14, 165, 233, 0.1); color: var(--accent-blue); border: 1px solid rgba(14, 165, 233, 0.3); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; justify-self: end; }
 
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: gap; gap: 15px; }
         .page-title { font-size: 18px; color: var(--text-muted); font-weight: 500; }
         .page-title span { color: var(--text-main); font-weight: 700; }
         
@@ -99,9 +94,6 @@
         .form-grid { display: flex; gap: 14px; flex-wrap: wrap; }
         .form-grid input, .form-grid select { flex: 1; min-width: 170px; }
         .btn-green { background: var(--accent-green); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
-        
-        .view-section { display: none; }
-        .view-section.active-view { display: block; }
     </style>
 
     <script type="module">
@@ -151,3 +143,538 @@
             },
             {
                 teamName: "PGX",
+                leader: "Jordan Kelly",
+                agents: [
+                    { id: 16, name: "Stewart Martin", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 17, name: "Michael Morgan", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
+                    { id: 18, name: "Jeremy Welson", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 19, name: "Diana Smith", g2g: 5, days: 5, status: "Active", type: "Full-Time" },
+                    { id: 20, name: "Hannah vance", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 21, name: "camila johns", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 22, name: "caitlyn adam", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
+                    { id: 23, name: "Owen willson", g2g: 8, days: 8, status: "Active", type: "Full-Time" }
+                ]
+            },
+            {
+                teamName: "Logistics",
+                leader: "Joey Millner",
+                agents: [
+                    { id: 24, name: "Marcy miller", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 25, name: "liz fox", g2g: 20, days: 7, status: "Active", type: "Full-Time" },
+                    { id: 26, name: "Melaine Brown", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 27, name: "Ben Camel", g2g: 15, days: 5, status: "Active", type: "Full-Time" },
+                    { id: 28, name: "Oscar Camel", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 29, name: "David Green", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 30, name: "Luke Grant", g2g: 20, days: 7, status: "Active", type: "Full-Time" },
+                    { id: 31, name: "Rachel Adams", g2g: 22, days: 8, status: "Active", type: "Full-Time" }
+                ]
+            },
+            {
+                teamName: "The Hive",
+                leader: "Ashley Murphy",
+                agents: [
+                    { id: 32, name: "Lexi Jones", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
+                    { id: 33, name: "Daisy Wayne", g2g: 7, days: 7, status: "Active", type: "Full-Time" }
+                ]
+            }
+        ];
+
+        window.teamsData = JSON.parse(JSON.stringify(defaultTeamsData));
+
+        const docRef = doc(db, "crm", "octoberData");
+        onSnapshot(docRef, async (docSnap) => {
+            if (docSnap.exists() && docSnap.data().teams) {
+                window.teamsData = docSnap.data().teams;
+                if (typeof window.renderAll === 'function') {
+                    window.renderAll();
+                }
+            } else {
+                await setDoc(docRef, { teams: defaultTeamsData });
+            }
+        });
+
+        window.saveToCloud = async function() {
+            try {
+                await setDoc(docRef, { teams: window.teamsData });
+            } catch (error) {
+                console.error("Error saving to cloud:", error);
+            }
+        };
+
+        window.resetCloudData = async function() {
+            if (confirm("Are you sure you want to reset all cloud data to default?")) {
+                window.teamsData = JSON.parse(JSON.stringify(defaultTeamsData));
+                await window.saveToCloud();
+                window.renderAll();
+            }
+        };
+
+        window.addNewAgent = function() {
+            let name = document.getElementById("newAgentName").value.trim();
+            let teamName = document.getElementById("newAgentTeam").value;
+            let g2g = parseFloat(document.getElementById("newAgentG2G").value);
+            let days = parseFloat(document.getElementById("newAgentDays").value);
+            let status = document.getElementById("newAgentStatus").value;
+            let type = document.getElementById("newAgentType").value;
+
+            if (!name || isNaN(g2g) || isNaN(days)) {
+                alert("Please fill in all agent fields correctly!");
+                return;
+            }
+
+            let team = window.teamsData.find(t => t.teamName === teamName);
+            if (team) {
+                let newId = Date.now();
+                team.agents.push({ id: newId, name, g2g, days, status, type });
+                document.getElementById("newAgentName").value = "";
+                document.getElementById("newAgentG2G").value = "";
+                document.getElementById("newAgentDays").value = "";
+                window.saveToCloud();
+                window.renderAll();
+            }
+        };
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <div class="navbar">
+        <div class="logo-area">
+            <img src="GGO-White-Var3 (1).png" alt="GGO Logo" class="logo-img">
+        </div>
+        <div class="navbar-title">GGO Targets</div>
+        <div class="nav-badge">Live Cloud Sync</div>
+    </div>
+
+    <div class="page-header">
+        <div class="page-title"><span>|</span> Team Leaders & Agents Performance Dashboard</div>
+        <div class="cycle-info-box" id="cycleInfoBox">Calculating current cycle working days...</div>
+        <button class="btn-reset" onclick="window.resetCloudData()">Reset Cloud Data</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="title">Total Teams</div>
+            <div class="value" id="totalTeamsCount">5</div>
+        </div>
+        <div class="stat-card">
+            <div class="title">Teams Qualified (Achieved)</div>
+            <div class="value" id="qualifiedTeamsCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="title">Teams Below Target</div>
+            <div class="value" id="belowTeamsCount">0</div>
+        </div>
+    </div>
+
+    <div class="filters-bar">
+        <select id="filterTeam" onchange="renderAll()">
+            <option value="">All Teams</option>
+            <option value="Wazowski">Wazowski (TL: Mavis Miller)</option>
+            <option value="Bloom">Bloom (TL: Donna Bell)</option>
+            <option value="PGX">PGX (TL: Jordan Kelly)</option>
+            <option value="Logistics">Logistics (TL: Joey Millner)</option>
+            <option value="The Hive">The Hive (TL: Ashley Murphy)</option>
+        </select>
+        <input type="text" id="searchAgent" placeholder="Search agent name..." onkeyup="renderAll()" style="max-width: 260px;">
+    </div>
+
+    <div class="table-container">
+        <div class="table-header-title">Team Leaders Performance & Tiers Overview</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Team Name</th>
+                    <th>Team Leader</th>
+                    <th>Total G2G / Days</th>
+                    <th>Team Ratio</th>
+                    <th>Achieved Tier</th>
+                    <th>Progress to Next Tier</th>
+                </tr>
+            </thead>
+            <tbody id="teamTableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="form-box">
+        <h3>Add New Agent Record</h3>
+        <div class="form-grid">
+            <input type="text" id="newAgentName" placeholder="Agent Full Name">
+            <select id="newAgentTeam">
+                <option value="Wazowski">Wazowski</option>
+                <option value="Bloom">Bloom</option>
+                <option value="PGX">PGX</option>
+                <option value="Logistics">Logistics</option>
+                <option value="The Hive">The Hive</option>
+            </select>
+            <input type="number" id="newAgentG2G" placeholder="G2G Sales">
+            <input type="number" id="newAgentDays" placeholder="Attended Days">
+            <select id="newAgentType">
+                <option value="Full-Time">Full-Time</option>
+                <option value="Part-Time">Part-Time</option>
+            </select>
+            <select id="newAgentStatus">
+                <option value="Active">Active</option>
+                <option value="On Probation">On Probation</option>
+                <option value="Two Weeks Notice">Two Weeks Notice</option>
+                <option value="Resigned">Resigned</option>
+                <option value="Terminated">Terminated</option>
+            </select>
+            <button class="btn-green" onclick="addNewAgent()">Add Agent</button>
+        </div>
+    </div>
+
+    <!-- AGENTS TABLE -->
+    <div class="table-container">
+        <div class="table-header-title">Agents Detailed List & Status Control</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent Name</th>
+                    <th>Team</th>
+                    <th>Type</th>
+                    <th>Agent Status</th>
+                    <th>G2G Sales</th>
+                    <th>Attended Days</th>
+                    <th>Absent Days (Auto)</th>
+                    <th>Agent Ratio</th>
+                    <th>Agent Tier Status & Target Focus</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="agentsTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- KPIS TABLE -->
+    <div class="table-container">
+        <div class="table-header-title">Monthly KPIs Evaluation (Full-Timers Only: Ratio >= 1.0 & Absent <= 2 Days)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent Name</th>
+                    <th>Team</th>
+                    <th>Type</th>
+                    <th>G2G / Attended Days</th>
+                    <th>Ratio</th>
+                    <th>Absent Days</th>
+                    <th>KPI Status</th>
+                </tr>
+            </thead>
+            <tbody id="kpisTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Calculate Mon-Fri working days from 28th of previous month to current date (or 27th)
+    function calculateCycleMetrics() {
+        let now = new Date();
+        let year = now.getFullYear();
+        let month = now.getMonth(); // 0-indexed
+        
+        // If today is before 28th, cycle started on 28th of previous month
+        // If today is 28th or later, cycle started on 28th of current month
+        let startCycleDate, endCycleDate;
+        if (now.getDate() >= 28) {
+            startCycleDate = new Date(year, month, 28);
+            endCycleDate = new Date(year, month + 1, 27);
+        } else {
+            startCycleDate = new Date(year, month - 1, 28);
+            endCycleDate = new Date(year, month, 27);
+        }
+
+        // Target end date for active calculation is today (or end of cycle if past)
+        let calcEnd = now < endCycleDate ? new Date(now.getFullYear(), now.getMonth(), now.getDate()) : endCycleDate;
+
+        let totalWorkingDaysElapsed = 0;
+        let totalCycleWorkingDays = 0;
+
+        let curr = new Date(startCycleDate);
+        while (curr <= endCycleDate) {
+            let dayOfWeek = curr.getDay(); // 0 = Sun, 6 = Sat
+            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                totalCycleWorkingDays++;
+                if (curr <= calcEnd) {
+                    totalWorkingDaysElapsed++;
+                }
+            }
+            curr.setDate(curr.getDate() + 1);
+        }
+
+        return {
+            totalCycleWorkingDays: totalCycleWorkingDays > 0 ? totalCycleWorkingDays : 22,
+            totalWorkingDaysElapsed: totalWorkingDaysElapsed > 0 ? totalWorkingDaysElapsed : 8
+        };
+    }
+
+    window.renderAll = function() {
+        if (!window.teamsData) return;
+        let metrics = calculateCycleMetrics();
+        document.getElementById("cycleInfoBoxinnerHTML" || "cycleInfoBox").innerHTML = 
+            `📅 Cycle: 28 Sep - 27 Oct | Total Working Days Passed So Far: <b>${metrics.totalWorkingDaysElapsed} Days</b> (Out of ${metrics.totalCycleWorkingDays} Mon-Fri Days)`;
+        
+        renderTeamsSummary();
+        renderAgentsTable(metrics.totalWorkingDaysElapsed);
+        renderKpisTable(metrics.totalWorkingDaysElapsed);
+    }
+
+    function getTeamTierInfo(ratio) {
+        if (ratio >= 1.2) {
+            return { badge: '<span class="badge tier3">Tier 3 Achieved</span>', next: 'Max Tier Reached! 🎉' };
+        } else if (ratio >= 1.0) {
+            let diff = (1.2 - ratio).toFixed(2);
+            return { badge: '<span class="badge tier2">Tier 2 Achieved</span>', next: `Needs +${diff} ratio to reach Tier 3` };
+        } else if (ratio >= 0.85) {
+            let diff = (1.0 - ratio).toFixed(2);
+            return { badge: '<span class="badge tier1">Tier 1 Achieved</span>', next: `Needs +${diff} ratio to reach Tier 2` };
+        } else {
+            let diff = (0.85 - ratio).toFixed(2);
+            return { badge: '<span class="badge not-qualified">Below Target</span>', next: `Needs +${diff} ratio to reach Tier 1` };
+        }
+    }
+
+    function getAgentStandardTierInfo(ratio, days, g2g) {
+        if (ratio >= 1.2) {
+            return '<span class="badge tier3">Tier 3 Achieved</span> (Max Tier)';
+        } else if (ratio >= 1.0) {
+            let neededG2G = Math.ceil(1.2 * days) - g2g;
+            return `<span class="badge tier2">Tier 2 Achieved</span> <span class="next-tier-info">Needs +${neededG2G > 0 ? neededG2G : 1} G2G's to reach Tier 3</span>`;
+        } else if (ratio >= 0.85) {
+            let neededG2G = Math.ceil(1.0 * days) - g2g;
+            return `<span class="badge tier1">Tier 1 Achieved</span> <span class="next-tier-info">Needs +${neededG2G > 0 ? neededG2G : 1} G2G's to reach Tier 2</span>`;
+        } else {
+            let neededG2G = Math.ceil(0.85 * days) - g2g;
+            return `<span class="badge not-qualified">Below Target</span> <span class="next-tier-info">Needs +${neededG2G > 0 ? neededG2G : 1} G2G's to reach Tier 1</span>`;
+        }
+    }
+
+    function getAgentLogisticsTierInfo(ratio, days, g2g) {
+        if (ratio >= 3.0) {
+            return '<span class="badge tier2">Logistics Tier 2 Achieved</span> (Max Tier)';
+        } else if (ratio >= 2.5) {
+            let neededG2GForTier2 = Math.ceil(3.0 * days) - g2g;
+            return `<span class="badge tier1">Logistics Tier 1 Achieved</span> <span class="next-tier-info">Needs +${neededG2GForTier2} G2G's to reach Tier 2</span>`;
+        } else {
+            let neededG2GForTier1 = Math.ceil(2.5 * days) - g2g;
+            return `<span class="badge not-qualified">Below Target</span> <span class="next-tier-info">Needs +${neededG2GForTier1 > 0 ? neededG2GForTier1 : 1} G2G's to reach Tier 1</span>`;
+        }
+    }
+
+    function renderTeamsSummary() {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const teamTableBody = document.getElementById("teamTableBody");
+        teamTableBody.innerHTML = "";
+
+        let qualifiedCount = 0;
+        let belowCount = 0;
+        let filteredTeams = window.teamsData.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
+
+        filteredTeams.forEach(team => {
+            let agentsList = team.agents || [];
+            let totalG2G = agentsList.reduce((sum, a) => sum + (parseFloat(a.g2g) || 0), 0);
+            let totalDays = agentsList.reduce((sum, a) => sum + (parseFloat(a.days) || 0), 0);
+            let teamRatio = totalDays > 0 ? (totalG2G / totalDays).toFixed(2) : 0;
+            let numericRatio = parseFloat(teamRatio);
+
+            let tierData = { badge: '', next: '' };
+            let isAchieved = false;
+
+            if (team.teamName === "Logistics") {
+                let achievedCount = 0;
+                let belowCountLogistics = 0;
+                
+                agentsList.forEach(a => {
+                    let aRatio = a.days > 0 ? (a.g2g / a.days) : 0;
+                    if (aRatio >= 2.5) achievedCount++;
+                    else belowCountLogistics++;
+                });
+
+                isAchieved = achievedCount > (agentsList.length / 2);
+                tierData.badge = `<span class="badge tier1">${achievedCount} Achieved / ${belowCountLogistics} Below</span>`;
+                tierData.next = `Total Team Agents: ${agentsList.length} (Individual focus)`;
+            } else {
+                tierData = getTeamTierInfo(numericRatio);
+                isAchieved = numericRatio >= 0.85;
+            }
+
+            if (isAchieved) qualifiedCount++; else belowCount++;
+
+            teamTableBody.innerHTML += `<tr>
+                <td><b>${team.teamName}</b></td>
+                <td>${team.leader}</td>
+                <td>${totalG2G} G2G / ${totalDays} Days</td>
+                <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
+                <td>${tierData.badge}</td>
+                <td><span style="color: var(--text-muted); font-size: 12px; font-weight: 500;">${tierData.next}</span></td>
+            </tr>`;
+        });
+
+        document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
+        document.getElementById("belowTeamsCount").innerText = belowCount;
+        document.getElementById("totalTeamsCount").innerText = window.teamsData.length;
+    }
+
+    function renderAgentsTable(elapsedWorkingDays) {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
+        const agentsTableBody = document.getElementById("agentsTableBody");
+        agentsTableBody.innerHTML = "";
+
+        window.teamsData.forEach(team => {
+            if (selectedFilter === "" || team.teamName === selectedFilter) {
+                let agentsList = team.agents || [];
+                agentsList.forEach(agent => {
+                    if (agent.name.toLowerCase().includes(searchQuery)) {
+                        let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+                        let numericRatio = parseFloat(ratio);
+                        
+                        let isInactive = (agent.status === "Resigned" || agent.status === "Terminated");
+                        if (!agent.type) agent.type = "Full-Time";
+
+                        // Auto-calculate absence based on elapsed working days
+                        let absentDays = elapsedWorkingDays - (agent.days || 0);
+                        if (absentDays < 0) absentDays = 0;
+
+                        let agentStatusHtml = "";
+                        if (team.teamName === "Logistics") {
+                            agentStatusHtml = getAgentLogisticsTierInfo(numericRatio, agent.days, agent.g2g);
+                        } else {
+                            agentStatusHtml = getAgentStandardTierInfo(numericRatio, agent.days, agent.g2g);
+                        }
+
+                        agentsTableBody.innerHTML += `<tr>
+                            <td><input type="text" class="editable-text" value="${agent.name}" ${isInactive ? 'disabled style="color: #64748b;"' : `onchange="updateAgent(${agent.id}, 'name', this.value)"`}></td>
+                            <td>
+                                <select class="editable-select" ${isInactive ? 'disabled' : `onchange="moveAgent(${agent.id}, this.value)"`}>
+                                    <option value="Wazowski" ${team.teamName === 'Wazowski' ? 'selected' : ''}>Wazowski</option>
+                                    <option value="Bloom" ${team.teamName === 'Bloom' ? 'selected' : ''}>Bloom</option>
+                                    <option value="PGX" ${team.teamName === 'PGX' ? 'selected' : ''}>PGX</option>
+                                    <option value="Logistics" ${team.teamName === 'Logistics' ? 'selected' : ''}>Logistics</option>
+                                    <option value="The Hive" ${team.teamName === 'The Hive' ? 'selected' : ''}>The Hive</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="editable-select" onchange="updateAgent(${agent.id}, 'type', this.value)">
+                                    <option value="Full-Time" ${agent.type === 'Full-Time' ? 'selected' : ''}>Full-Time</option>
+                                    <option value="Part-Time" ${agent.type === 'Part-Time' ? 'selected' : ''}>Part-Time</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="editable-select" onchange="updateAgent(${agent.id}, 'status', this.value)">
+                                    <option value="Active" ${agent.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="On Probation" ${agent.status === 'On Probation' ? 'selected' : ''}>On Probation</option>
+                                    <option value="Two Weeks Notice" ${agent.status === 'Two Weeks Notice' ? 'selected' : ''}>Two Weeks Notice</option>
+                                    <option value="Resigned" ${agent.status === 'Resigned' ? 'selected' : ''}>Resigned</option>
+                                    <option value="Terminated" ${agent.status === 'Terminated' ? 'selected' : ''}>Terminated</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="editable-input" value="${agent.g2g}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'g2g', this.value)"`}></td>
+                            <td><input type="number" class="editable-input" value="${agent.days}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'days', this.value)"`}></td>
+                            <td><b style="color: #f87171;">${absentDays} Days</b></td>
+                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
+                            <td>${agentStatusHtml}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+            }
+        });
+    }
+
+    function renderKpisTable(elapsedWorkingDays) {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
+        const kpisTableBody = document.getElementById("kpisTableBody");
+        kpisTableBody.innerHTML = "";
+
+        window.teamsData.forEach(team => {
+            if (selectedFilter === "" || team.teamName === selectedFilter) {
+                let agentsList = team.agents || [];
+                agentsList.forEach(agent => {
+                    if (agent.name.toLowerCase().includes(searchQuery)) {
+                        let ratio = agent.days > 0 ? (agent.g2g / agent.days) : 0;
+                        let absentDays = elapsedWorkingDays - (agent.days || 0);
+                        if (absentDays < 0) absentDays = 0;
+                        let type = agent.type || "Full-Time";
+
+                        let kpiStatusHtml = "";
+                        if (type === "Part-Time") {
+                            kpiStatusHtml = '<span class="badge not-qualified">Not Eligible (Part-Time)</span>';
+                        } else {
+                            // Full-time condition: ratio >= 1.0 and absentDays <= 2
+                            if (ratio >= 1.0 && absentDays <= 2) {
+                                kpiStatusHtml = '<span class="badge tier3">KPI Achieved 🎉</span>';
+                            } else {
+                                let reasons = [];
+                                if (ratio < 1.0) reasons.push("Ratio < 1.0");
+                                if (absentDays > 2) reasons.push(`Absence > 2 days (${absentDays} days)`);
+                                kpiStatusHtml = `<span class="badge not-qualified">Not Achieved (${reasons.join(", ")})</span>`;
+                            }
+                        }
+
+                        kpisTableBody.innerHTML += `<tr>
+                            <td><b>${agent.name}</b></td>
+                            <td>${team.teamName}</td>
+                            <td>${type}</td>
+                            <td>${agent.g2g} G2G / ${agent.days} Attended Days</td>
+                            <td><b style="color: var(--accent-blue);">${ratio.toFixed(2)}</b></td>
+                            <td><b style="color: #f87171;">${absentDays} Days</b></td>
+                            <td>${kpiStatusHtml}</td>
+                        </tr>`;
+                    }
+                });
+            }
+        });
+    }
+
+    window.updateAgent = function(agentId, field, value) {
+        window.teamsData.forEach(team => {
+            let agent = team.agents.find(a => a.id === agentId);
+            if (agent) {
+                if (field === 'g2g' || field === 'days') {
+                    agent[field] = parseFloat(value) || 0;
+                } else {
+                    agent[field] = value.trim();
+                }
+                window.saveToCloud();
+                window.renderAll();
+            }
+        });
+    }
+
+    window.moveAgent = function(agentId, newTeamName) {
+        let targetAgent = null;
+        window.teamsData.forEach(team => {
+            let idx = team.agents.findIndex(a => a.id === agentId);
+            if (idx !== -1) {
+                targetAgent = team.agents[idx];
+                team.agents.splice(idx, 1);
+            }
+        });
+
+        if (targetAgent) {
+            let destTeam = window.teamsData.find(t => t.teamName === newTeamName);
+            if (destTeam) {
+                destTeam.agents.push(targetAgent);
+                window.saveToCloud();
+                window.renderAll();
+            }
+        }
+    }
+
+    window.deleteAgent = function(agentId) {
+        if (confirm("Are you sure you want to delete this agent?")) {
+            window.teamsData.forEach(team => {
+                team.agents = team.agents.filter(a => a.id !== agentId);
+            });
+            window.saveToCloud();
+            window.renderAll();
+        }
+    }
+</script>
+
+</body>
+</html>
