@@ -32,10 +32,10 @@
         
         .container { max-width: 1450px; margin: 0 auto; }
         
-        /* Navbar Professional Look with Centered Title & Left Logo */
+        /* Navbar Professional Look */
         .navbar { 
-            display: grid; 
-            grid-template-columns: 1fr auto 1fr; 
+            display: flex; 
+            justify-content: space-between; 
             align-items: center; 
             background: var(--card-bg); 
             padding: 16px 28px; 
@@ -44,28 +44,24 @@
             margin-bottom: 30px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        
         .logo-area { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            justify-self: start;
-        }
-        .logo-img {
-            height: 38px;
-            width: auto;
-            object-fit: contain;
-            border-radius: 6px;
-        }
-
-        .navbar-title {
             font-weight: 700; 
-            font-size: 22px; 
+            font-size: 20px; 
             color: white; 
             letter-spacing: 0.5px;
-            justify-self: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
+        .logo-area::before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
         .nav-badge { 
             background: rgba(14, 165, 233, 0.1); 
             color: var(--accent-blue); 
@@ -73,8 +69,7 @@
             padding: 6px 14px; 
             border-radius: 8px; 
             font-size: 13px; 
-            font-weight: 600;
-            justify-self: end;
+            font-weight: 600; 
         }
 
         .page-header { margin-bottom: 24px; }
@@ -179,15 +174,7 @@
 
 <div class="container">
     <div class="navbar">
-        <!-- Logo 3l shmal -->
-        <div class="logo-area">
-            <!-- 7ty link el logo bta3k henak fe src aw saby el sora -->
-            <img src="https://via.placeholder.com/120x40/0ea5e9/ffffff?text=GGO+LOGO" alt="GGO Logo" class="logo-img">
-        </div>
-        
-        <!-- GGO Targets fel nos -->
-        <div class="navbar-title">GGO Targets</div>
-        
+        <div class="logo-area">GGO Targets</div>
         <div class="nav-badge">Professional Edition</div>
     </div>
 
@@ -249,4 +236,61 @@
                 <option value="Logistics">Logistics</option>
             </select>
             <input type="number" id="newAgentG2G" placeholder="G2G Sales">
-            <input type="number" id="newAgentDays
+            <input type="number" id="newAgentDays" placeholder="Attended Days">
+            <select id="newAgentStatus">
+                <option value="Active">Active</option>
+                <option value="Resigned">Resigned</option>
+            </select>
+            <button class="btn-green" onclick="addNewAgent()">Add Agent</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header-title">Agents Detailed List & Logistics Individual Tiers</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent Name</th>
+                    <th>Team</th>
+                    <th>G2G Sales</th>
+                    <th>Attended Days</th>
+                    <th>Agent Ratio</th>
+                    <th>Agent Tier Status (Logistics Focus)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="agentsTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let teamsData = [
+        {
+            teamName: "Wazowski",
+            leader: "Mavis Miller",
+            agents: [
+                { id: 1, name: "Victor Collins", g2g: 20, days: 20, status: "Active" },
+                { id: 2, name: "Adam Smith", g2g: 20, days: 20, status: "Active" },
+                { id: 3, name: "Mia Cooper", g2g: 20, days: 20, status: "Active" },
+                { id: 4, name: "Jessy Moore", g2g: 20, days: 20, status: "Active" },
+                { id: 5, name: "Amy Jonson", g2g: 20, days: 20, status: "Active" }
+            ]
+        },
+        {
+            teamName: "Bloom",
+            leader: "Donna Bell",
+            agents: [
+                { id: 6, name: "Celine Dami", g2g: 20, days: 20, status: "Active" },
+                { id: 7, name: "Kim Collins", g2g: 20, days: 20, status: "Active" },
+                { id: 8, name: "Heaven Davis", g2g: 20, days: 20, status: "Active" },
+                { id: 9, name: "Maddy Snow", g2g: 20, days: 20, status: "Active" },
+                { id: 10, name: "Jules Brown", g2g: 20, days: 20, status: "Active" },
+                { id: 11, name: "Anna Nelson", g2g: 20, days: 20, status: "Active" },
+                { id: 12, name: "Jennifer Adams", g2g: 20, days: 20, status: "Active" },
+                { id: 13, name: "Katherine Adams", g2g: 20, days: 20, status: "Active" },
+                { id: 14, name: "Eric Dean", g2g: 20, days: 20, status: "Active" },
+                { id: 15, name: "Roben Neves", g2g: 20, days: 20, status: "Active" }
+            ]
+        },
+        {
