@@ -252,7 +252,7 @@
             try {
                 const docRef = doc(db, "crm", "octoberData");
                 const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
+                if (docSnap.exists() && docSnap.data().teams) {
                     window.teamsData = docSnap.data().teams;
                 } else {
                     await setDoc(docRef, { teams: defaultTeamsData });
@@ -511,4 +511,94 @@
                                 <select class="editable-select" onchange="updateAgent(${agent.id}, 'status', this.value)">
                                     <option value="Active" ${agent.status === 'Active' ? 'selected' : ''}>Active</option>
                                     <option value="On Probation" ${agent.status === 'On Probation' ? 'selected' : ''}>On Probation</option>
-                                    <option value
+                                    <option value="Two Weeks Notice" ${agent.status === 'Two Weeks Notice' ? 'selected' : ''}>Two Weeks Notice</option>
+                                    <option value="Resigned" ${agent.status === 'Resigned' ? 'selected' : ''}>Resigned</option>
+                                    <option value="Terminated" ${agent.status === 'Terminated' ? 'selected' : ''}>Terminated</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="editable-input" value="${agent.g2g}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'g2g', this.value)"`}></td>
+                            <td><input type="number" class="editable-input" value="${agent.days}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'days', this.value)"`}></td>
+                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
+                            <td>${agentStatusHtml}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+            }
+        });
+    }
+
+    window.updateAgent = function(agentId, field, value) {
+        window.teamsData.forEach(team => {
+            let agent = team.agents.find(a => a.id === agentId);
+            if (agent) {
+                if (field === 'g2g' || field === 'days') {
+                    agent[field] = parseFloat(value) || 0;
+                } else {
+                    agent[field] = value.trim();
+                }
+                window.saveToCloud();
+                window.renderAll();
+            }
+        });
+    }
+
+    window.moveAgent = function(agentId, newTeamName) {
+        let targetAgent = null;
+        window.teamsData.forEach(team => {
+            let idx = team.agents.findIndex(a => a.id === agentId);
+            if (idx !== -1) {
+                targetAgent = team.agents[idx];
+                team.agents.splice(idx, 1);
+            }
+        });
+
+        if (targetAgent) {
+            let destTeam = window.teamsData.find(t => t.teamName === newTeamName);
+            if (destTeam) {
+                destTeam.agents.push(targetAgent);
+                window.saveToCloud();
+                window.renderAll();
+            }
+        }
+    }
+
+    window.addNewAgent = function() {
+        let name = document.getElementById("newAgentName").value.trim();
+        let teamName = document.getElementById("newAgentTeam").value;
+        let g2g = parseFloat(document.getElementById("newAgentG2G").value);
+        let days = parseFloat(document.getElementById("newAgentDays").value);
+        let status = document.getElementById("newAgentStatus").value;
+
+        if (!name || isNaN(g2g) || isNaN(days)) {
+            alert("Please fill in all agent fields correctly!");
+            return;
+        }
+
+        let team = window.teamsData.find(t => t.teamName === teamName);
+        if (team) {
+            let newId = Date.now();
+            team.agents.push({ id: newId, name, g2g, days, status });
+            document.getElementById("newAgentName").value = "";
+            document.getElementById("newAgentG2G").value = "";
+            document.getElementById("newAgentDays").value = "";
+            window.saveToCloud();
+            window.renderAll();
+        }
+    }
+
+    window.deleteAgent = function(agentId) {
+        if (confirm("Are you sure you want to delete this agent?")) {
+            window.teamsData.forEach(team => {
+                team.agents = team.agents.filter(a => a.id !== agentId);
+            });
+            window.saveToCloud();
+            window.renderAll();
+        }
+    }
+</script>
+
+</body>
+</html>
