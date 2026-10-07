@@ -294,3 +294,234 @@
             ]
         },
         {
+            teamName: "PGX",
+            leader: "Jordan Kelly",
+            agents: [
+                { id: 16, name: "Stewart Martin", g2g: 20, days: 20, status: "Active" },
+                { id: 17, name: "Michael Morgan", g2g: 20, days: 20, status: "Active" },
+                { id: 18, name: "Jeremy Welson", g2g: 20, days: 20, status: "Active" },
+                { id: 19, name: "Diana Smith", g2g: 20, days: 20, status: "Active" },
+                { id: 20, name: "Hannah vance", g2g: 20, days: 20, status: "Active" },
+                { id: 21, name: "camila johns", g2g: 20, days: 20, status: "Active" },
+                { id: 22, name: "caitlyn adam", g2g: 20, days: 20, status: "Active" },
+                { id: 23, name: "Owen willson", g2g: 20, days: 20, status: "Active" }
+            ]
+        },
+        {
+            teamName: "Logistics",
+            leader: "Joey Millner",
+            agents: [
+                { id: 24, name: "Marcy miller", g2g: 50, days: 20, status: "Active" },
+                { id: 25, name: "liz fox", g2g: 50, days: 20, status: "Active" },
+                { id: 26, name: "Melaine Brown", g2g: 50, days: 20, status: "Active" },
+                { id: 27, name: "Ben Camel", g2g: 50, days: 20, status: "Active" },
+                { id: 28, name: "Oscar Camel", g2g: 50, days: 20, status: "Active" },
+                { id: 29, name: "David Green", g2g: 50, days: 20, status: "Active" },
+                { id: 30, name: "Luke Grant", g2g: 50, days: 20, status: "Active" },
+                { id: 31, name: "Rachel Adams", g2g: 50, days: 20, status: "Active" }
+            ]
+        }
+    ];
+
+    function renderAll() {
+        renderTeamsSummary();
+        renderAgentsTable();
+    }
+
+    function getTeamTierInfo(ratio) {
+        if (ratio >= 1.2) {
+            return { badge: '<span class="badge tier3">Tier 3 Achieved</span>', next: 'Max Tier Reached! 🎉' };
+        } else if (ratio >= 1.0) {
+            let diff = (1.2 - ratio).toFixed(2);
+            return { badge: '<span class="badge tier2">Tier 2 Achieved</span>', next: `Needs +${diff} ratio to reach Tier 3` };
+        } else if (ratio >= 0.85) {
+            let diff = (1.0 - ratio).toFixed(2);
+            return { badge: '<span class="badge tier1">Tier 1 Achieved</span>', next: `Needs +${diff} ratio to reach Tier 2` };
+        } else {
+            let diff = (0.85 - ratio).toFixed(2);
+            return { badge: '<span class="badge not-qualified">Below Target</span>', next: `Needs +${diff} ratio to reach Tier 1` };
+        }
+    }
+
+    function getAgentLogisticsTierInfo(ratio, days, g2g) {
+        if (ratio >= 3.0) {
+            return '<span class="badge tier2">Logistics Tier 2 Achieved</span> (Max Tier)';
+        } else if (ratio >= 2.5) {
+            let neededG2GForTier2 = Math.ceil(3.0 * days) - g2g;
+            return `<span class="badge tier1">Logistics Tier 1 Achieved</span> <span class="next-tier-info">Needs +${neededG2GForTier2} G2G's to reach Tier 2</span>`;
+        } else {
+            let neededG2GForTier1 = Math.ceil(2.5 * days) - g2g;
+            return `<span class="badge not-qualified">Below Target</span> <span class="next-tier-info">Needs +${neededG2GForTier1 > 0 ? neededG2GForTier1 : 1} G2G's to reach Tier 1</span>`;
+        }
+    }
+
+    function renderTeamsSummary() {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const teamTableBody = document.getElementById("teamTableBody");
+        teamTableBody.innerHTML = "";
+
+        let qualifiedCount = 0;
+        let belowCount = 0;
+        let filteredTeams = teamsData.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
+
+        filteredTeams.forEach(team => {
+            let agentsList = team.agents || [];
+            let totalG2G = agentsList.reduce((sum, a) => sum + (parseFloat(a.g2g) || 0), 0);
+            let totalDays = agentsList.reduce((sum, a) => sum + (parseFloat(a.days) || 0), 0);
+            let teamRatio = totalDays > 0 ? (totalG2G / totalDays).toFixed(2) : 0;
+            let numericRatio = parseFloat(teamRatio);
+
+            let tierData = { badge: '', next: '' };
+            let isAchieved = false;
+
+            if (team.teamName === "Logistics") {
+                // حساب كام أجينت محقق وكام أجينت لأ في تيم اللوجستيكس (يعني Ratio >= 2.5)
+                let achievedCount = 0;
+                let belowCountLogistics = 0;
+                
+                agentsList.forEach(a => {
+                    let aRatio = a.days > 0 ? (a.g2g / a.days) : 0;
+                    if (aRatio >= 2.5) achievedCount++;
+                    else belowCountLogistics++;
+                });
+
+                isAchieved = achievedCount > (agentsList.length / 2);
+                tierData.badge = `<span class="badge tier1">${achievedCount} Achieved / ${belowCountLogistics} Below</span>`;
+                tierData.next = `Total Team Agents: ${agentsList.length} (Individual focus)`;
+            } else {
+                tierData = getTeamTierInfo(numericRatio);
+                isAchieved = numericRatio >= 0.85;
+            }
+
+            if (isAchieved) qualifiedCount++; else belowCount++;
+
+            teamTableBody.innerHTML += `<tr>
+                <td><b>${team.teamName}</b></td>
+                <td>${team.leader}</td>
+                <td>${totalG2G} G2G / ${totalDays} Days</td>
+                <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
+                <td>${tierData.badge}</td>
+                <td><span style="color: var(--text-muted); font-size: 12px; font-weight: 500;">${tierData.next}</span></td>
+            </tr>`;
+        });
+
+        document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
+        document.getElementById("belowTeamsCount").innerText = belowCount;
+        document.getElementById("totalTeamsCount").innerText = teamsData.length;
+    }
+
+    function renderAgentsTable() {
+        const selectedFilter = document.getElementById("filterTeam").value;
+        const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
+        const agentsTableBody = document.getElementById("agentsTableBody");
+        agentsTableBody.innerHTML = "";
+
+        teamsData.forEach(team => {
+            if (selectedFilter === "" || team.teamName === selectedFilter) {
+                let agentsList = team.agents || [];
+                agentsList.forEach(agent => {
+                    if (agent.name.toLowerCase().includes(searchQuery)) {
+                        let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+                        let numericRatio = parseFloat(ratio);
+                        
+                        let agentStatusHtml = "";
+                        if (team.teamName === "Logistics") {
+                            agentStatusHtml = getAgentLogisticsTierInfo(numericRatio, agent.days, agent.g2g);
+                        } else {
+                            agentStatusHtml = `<span style="color: var(--text-muted); font-size: 12px;">Standard Team Agent (Depends on Team Ratio)</span>`;
+                        }
+
+                        agentsTableBody.innerHTML += `<tr>
+                            <td><input type="text" class="editable-text" value="${agent.name}" onchange="updateAgent(${agent.id}, 'name', this.value)"></td>
+                            <td>
+                                <select class="editable-select" onchange="moveAgent(${agent.id}, this.value)">
+                                    <option value="Wazowski" ${team.teamName === 'Wazowski' ? 'selected' : ''}>Wazowski</option>
+                                    <option value="Bloom" ${team.teamName === 'Bloom' ? 'selected' : ''}>Bloom</option>
+                                    <option value="PGX" ${team.teamName === 'PGX' ? 'selected' : ''}>PGX</option>
+                                    <option value="Logistics" ${team.teamName === 'Logistics' ? 'selected' : ''}>Logistics</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="editable-input" value="${agent.g2g}" onchange="updateAgent(${agent.id}, 'g2g', this.value)"></td>
+                            <td><input type="number" class="editable-input" value="${agent.days}" onchange="updateAgent(${agent.id}, 'days', this.value)"></td>
+                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
+                            <td>${agentStatusHtml}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+            }
+        });
+    }
+
+    function updateAgent(agentId, field, value) {
+        teamsData.forEach(team => {
+            let agent = team.agents.find(a => a.id === agentId);
+            if (agent) {
+                if (field === 'g2g' || field === 'days') {
+                    agent[field] = parseFloat(value) || 0;
+                } else {
+                    agent[field] = value.trim();
+                }
+                renderAll();
+            }
+        });
+    }
+
+    function moveAgent(agentId, newTeamName) {
+        let targetAgent = null;
+        teamsData.forEach(team => {
+            let idx = team.agents.findIndex(a => a.id === agentId);
+            if (idx !== -1) {
+                targetAgent = team.agents[idx];
+                team.agents.splice(idx, 1);
+            }
+        });
+
+        if (targetAgent) {
+            let destTeam = teamsData.find(t => t.teamName === newTeamName);
+            if (destTeam) {
+                destTeam.agents.push(targetAgent);
+                renderAll();
+            }
+        }
+    }
+
+    function addNewAgent() {
+        let name = document.getElementById("newAgentName").value.trim();
+        let teamName = document.getElementById("newAgentTeam").value;
+        let g2g = parseFloat(document.getElementById("newAgentG2G").value);
+        let days = parseFloat(document.getElementById("newAgentDays").value);
+        let status = document.getElementById("newAgentStatus").value;
+
+        if (!name || isNaN(g2g) || isNaN(days)) {
+            alert("Please fill in all agent fields correctly!");
+            return;
+        }
+
+        let team = teamsData.find(t => t.teamName === teamName);
+        if (team) {
+            let newId = Date.now();
+            team.agents.push({ id: newId, name, g2g, days, status });
+            document.getElementById("newAgentName").value = "";
+            document.getElementById("newAgentG2G").value = "";
+            document.getElementById("newAgentDays").value = "";
+            renderAll();
+        }
+    }
+
+    function deleteAgent(agentId) {
+        if (confirm("Are you sure you want to delete this agent?")) {
+            teamsData.forEach(team => {
+                team.agents = team.agents.filter(a => a.id !== agentId);
+            });
+            renderAll();
+        }
+    }
+
+    renderAll();
+</script>
+
+</body>
+</html>
