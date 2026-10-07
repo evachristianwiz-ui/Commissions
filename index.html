@@ -47,12 +47,9 @@
         .navbar-title { font-weight: 700; font-size: 22px; color: white; justify-self: center; }
         .nav-badge { background: rgba(14, 165, 233, 0.1); color: var(--accent-blue); border: 1px solid rgba(14, 165, 233, 0.3); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; justify-self: end; }
 
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: gap; gap: 15px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .page-title { font-size: 18px; color: var(--text-muted); font-weight: 500; }
         .page-title span { color: var(--text-main); font-weight: 700; }
-        
-        .cycle-info-box { background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.3); padding: 10px 18px; border-radius: 10px; color: var(--accent-blue); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-
         .btn-reset { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
         .btn-reset:hover { background: #ef4444; color: white; }
 
@@ -64,7 +61,7 @@
         .stat-card .title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 10px; }
         .stat-card .value { font-size: 28px; font-weight: 700; color: white; }
 
-        .filters-bar { display: flex; gap: 15px; margin-bottom: 24px; flex-wrap: wrap; background: var(--card-bg); padding: 18px; border-radius: 14px; border: 1px solid var(--border-color); align-items: center; }
+        .filters-bar { display: flex; gap: 15px; margin-bottom: 24px; flex-wrap: wrap; background: var(--card-bg); padding: 18px; border-radius: 14px; border: 1px solid var(--border-color); }
         select, input { padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #070b19; color: white; outline: none; font-family: inherit; }
         select:focus, input:focus { border-color: var(--accent-blue); }
 
@@ -118,63 +115,63 @@
                 teamName: "Wazowski",
                 leader: "Mavis Miller",
                 agents: [
-                    { id: 1, name: "Victor Collins", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 2, name: "Adam Smith", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 3, name: "Mia Cooper", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 4, name: "Jessy Moore", g2g: 5, days: 5, status: "Active", type: "Full-Time" },
-                    { id: 5, name: "Amy Jonson", g2g: 8, days: 8, status: "Active", type: "Full-Time" }
+                    { id: 1, name: "Victor Collins", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 2, name: "Adam Smith", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 3, name: "Mia Cooper", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 4, name: "Jessy Moore", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 5, name: "Amy Jonson", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 }
                 ]
             },
             {
                 teamName: "Bloom",
                 leader: "Donna Bell",
                 agents: [
-                    { id: 6, name: "Celine Dami", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 7, name: "Kim Collins", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 8, name: "Heaven Davis", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 9, name: "Maddy Snow", g2g: 5, days: 5, status: "Active", type: "Full-Time" },
-                    { id: 10, name: "Jules Brown", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 11, name: "Anna Nelson", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 12, name: "Jennifer Adams", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 13, name: "Katherine Adams", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 14, name: "Eric Dean", g2g: 5, days: 5, status: "Active", type: "Full-Time" },
-                    { id: 15, name: "Roben Neves", g2g: 8, days: 8, status: "Active", type: "Full-Time" }
+                    { id: 6, name: "Celine Dami", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 7, name: "Kim Collins", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 8, name: "Heaven Davis", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 9, name: "Maddy Snow", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 10, name: "Jules Brown", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 11, name: "Anna Nelson", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 12, name: "Jennifer Adams", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 13, name: "Katherine Adams", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 14, name: "Eric Dean", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 15, name: "Roben Neves", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 }
                 ]
             },
             {
                 teamName: "PGX",
                 leader: "Jordan Kelly",
                 agents: [
-                    { id: 16, name: "Stewart Martin", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 17, name: "Michael Morgan", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 18, name: "Jeremy Welson", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 19, name: "Diana Smith", g2g: 5, days: 5, status: "Active", type: "Full-Time" },
-                    { id: 20, name: "Hannah vance", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 21, name: "camila johns", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 22, name: "caitlyn adam", g2g: 7, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 23, name: "Owen willson", g2g: 8, days: 8, status: "Active", type: "Full-Time" }
+                    { id: 16, name: "Stewart Martin", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 17, name: "Michael Morgan", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 18, name: "Jeremy Welson", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 19, name: "Diana Smith", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 20, name: "Hannah vance", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 21, name: "camila johns", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 22, name: "caitlyn adam", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 23, name: "Owen willson", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 }
                 ]
             },
             {
                 teamName: "Logistics",
                 leader: "Joey Millner",
                 agents: [
-                    { id: 24, name: "Marcy miller", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 25, name: "liz fox", g2g: 20, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 26, name: "Melaine Brown", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 27, name: "Ben Camel", g2g: 15, days: 5, status: "Active", type: "Full-Time" },
-                    { id: 28, name: "Oscar Camel", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 29, name: "David Green", g2g: 22, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 30, name: "Luke Grant", g2g: 20, days: 7, status: "Active", type: "Full-Time" },
-                    { id: 31, name: "Rachel Adams", g2g: 22, days: 8, status: "Active", type: "Full-Time" }
+                    { id: 24, name: "Marcy miller", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 25, name: "liz fox", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 26, name: "Melaine Brown", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 27, name: "Ben Camel", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 28, name: "Oscar Camel", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 29, name: "David Green", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 30, name: "Luke Grant", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 31, name: "Rachel Adams", g2g: 50, days: 20, status: "Active", type: "Full-Time", absDays: 0 }
                 ]
             },
             {
                 teamName: "The Hive",
                 leader: "Ashley Murphy",
                 agents: [
-                    { id: 32, name: "Lexi Jones", g2g: 8, days: 8, status: "Active", type: "Full-Time" },
-                    { id: 33, name: "Daisy Wayne", g2g: 7, days: 7, status: "Active", type: "Full-Time" }
+                    { id: 32, name: "Lexi Jones", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 },
+                    { id: 33, name: "Daisy Wayne", g2g: 20, days: 20, status: "Active", type: "Full-Time", absDays: 0 }
                 ]
             }
         ];
@@ -216,6 +213,7 @@
             let days = parseFloat(document.getElementById("newAgentDays").value);
             let status = document.getElementById("newAgentStatus").value;
             let type = document.getElementById("newAgentType").value;
+            let absDays = parseFloat(document.getElementById("newAgentAbsDays").value) || 0;
 
             if (!name || isNaN(g2g) || isNaN(days)) {
                 alert("Please fill in all agent fields correctly!");
@@ -225,10 +223,11 @@
             let team = window.teamsData.find(t => t.teamName === teamName);
             if (team) {
                 let newId = Date.now();
-                team.agents.push({ id: newId, name, g2g, days, status, type });
+                team.agents.push({ id: newId, name, g2g, days, status, type, absDays });
                 document.getElementById("newAgentName").value = "";
                 document.getElementById("newAgentG2G").value = "";
                 document.getElementById("newAgentDays").value = "";
+                document.getElementById("newAgentAbsDays").value = "";
                 window.saveToCloud();
                 window.renderAll();
             }
@@ -248,7 +247,6 @@
 
     <div class="page-header">
         <div class="page-title"><span>|</span> Team Leaders & Agents Performance Dashboard</div>
-        <div class="cycle-info-box" id="cycleInfoBox">Calculating current cycle working days...</div>
         <button class="btn-reset" onclick="window.resetCloudData()">Reset Cloud Data</button>
     </div>
 
@@ -309,6 +307,7 @@
             </select>
             <input type="number" id="newAgentG2G" placeholder="G2G Sales">
             <input type="number" id="newAgentDays" placeholder="Attended Days">
+            <input type="number" id="newAgentAbsDays" placeholder="Absent Days">
             <select id="newAgentType">
                 <option value="Full-Time">Full-Time</option>
                 <option value="Part-Time">Part-Time</option>
@@ -336,7 +335,7 @@
                     <th>Agent Status</th>
                     <th>G2G Sales</th>
                     <th>Attended Days</th>
-                    <th>Absent Days (Auto)</th>
+                    <th>Absent Days</th>
                     <th>Agent Ratio</th>
                     <th>Agent Tier Status & Target Focus</th>
                     <th>Actions</th>
@@ -355,7 +354,7 @@
                     <th>Agent Name</th>
                     <th>Team</th>
                     <th>Type</th>
-                    <th>G2G / Attended Days</th>
+                    <th>G2G / Days</th>
                     <th>Ratio</th>
                     <th>Absent Days</th>
                     <th>KPI Status</th>
@@ -367,56 +366,11 @@
 </div>
 
 <script>
-    // Calculate Mon-Fri working days from 28th of previous month to current date (or 27th)
-    function calculateCycleMetrics() {
-        let now = new Date();
-        let year = now.getFullYear();
-        let month = now.getMonth(); // 0-indexed
-        
-        // If today is before 28th, cycle started on 28th of previous month
-        // If today is 28th or later, cycle started on 28th of current month
-        let startCycleDate, endCycleDate;
-        if (now.getDate() >= 28) {
-            startCycleDate = new Date(year, month, 28);
-            endCycleDate = new Date(year, month + 1, 27);
-        } else {
-            startCycleDate = new Date(year, month - 1, 28);
-            endCycleDate = new Date(year, month, 27);
-        }
-
-        // Target end date for active calculation is today (or end of cycle if past)
-        let calcEnd = now < endCycleDate ? new Date(now.getFullYear(), now.getMonth(), now.getDate()) : endCycleDate;
-
-        let totalWorkingDaysElapsed = 0;
-        let totalCycleWorkingDays = 0;
-
-        let curr = new Date(startCycleDate);
-        while (curr <= endCycleDate) {
-            let dayOfWeek = curr.getDay(); // 0 = Sun, 6 = Sat
-            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                totalCycleWorkingDays++;
-                if (curr <= calcEnd) {
-                    totalWorkingDaysElapsed++;
-                }
-            }
-            curr.setDate(curr.getDate() + 1);
-        }
-
-        return {
-            totalCycleWorkingDays: totalCycleWorkingDays > 0 ? totalCycleWorkingDays : 22,
-            totalWorkingDaysElapsed: totalWorkingDaysElapsed > 0 ? totalWorkingDaysElapsed : 8
-        };
-    }
-
     window.renderAll = function() {
         if (!window.teamsData) return;
-        let metrics = calculateCycleMetrics();
-        document.getElementById("cycleInfoBoxinnerHTML" || "cycleInfoBox").innerHTML = 
-            `📅 Cycle: 28 Sep - 27 Oct | Total Working Days Passed So Far: <b>${metrics.totalWorkingDaysElapsed} Days</b> (Out of ${metrics.totalCycleWorkingDays} Mon-Fri Days)`;
-        
         renderTeamsSummary();
-        renderAgentsTable(metrics.totalWorkingDaysElapsed);
-        renderKpisTable(metrics.totalWorkingDaysElapsed);
+        renderAgentsTable();
+        renderKpisTable();
     }
 
     function getTeamTierInfo(ratio) {
@@ -515,7 +469,7 @@
         document.getElementById("totalTeamsCount").innerText = window.teamsData.length;
     }
 
-    function renderAgentsTable(elapsedWorkingDays) {
+    function renderAgentsTable() {
         const selectedFilter = document.getElementById("filterTeam").value;
         const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
         const agentsTableBody = document.getElementById("agentsTableBody");
@@ -531,10 +485,7 @@
                         
                         let isInactive = (agent.status === "Resigned" || agent.status === "Terminated");
                         if (!agent.type) agent.type = "Full-Time";
-
-                        // Auto-calculate absence based on elapsed working days
-                        let absentDays = elapsedWorkingDays - (agent.days || 0);
-                        if (absentDays < 0) absentDays = 0;
+                        if (agent.absDays === undefined) agent.absDays = 0;
 
                         let agentStatusHtml = "";
                         if (team.teamName === "Logistics") {
@@ -571,7 +522,7 @@
                             </td>
                             <td><input type="number" class="editable-input" value="${agent.g2g}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'g2g', this.value)"`}></td>
                             <td><input type="number" class="editable-input" value="${agent.days}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'days', this.value)"`}></td>
-                            <td><b style="color: #f87171;">${absentDays} Days</b></td>
+                            <td><input type="number" class="editable-input" value="${agent.absDays}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'absDays', this.value)"`}></td>
                             <td><b style="color: var(--accent-blue);">${ratio}</b></td>
                             <td>${agentStatusHtml}</td>
                             <td>
@@ -584,7 +535,7 @@
         });
     }
 
-    function renderKpisTable(elapsedWorkingDays) {
+    function renderKpisTable() {
         const selectedFilter = document.getElementById("filterTeam").value;
         const searchQuery = document.getElementById("searchAgent").value.toLowerCase();
         const kpisTableBody = document.getElementById("kpisTableBody");
@@ -596,21 +547,20 @@
                 agentsList.forEach(agent => {
                     if (agent.name.toLowerCase().includes(searchQuery)) {
                         let ratio = agent.days > 0 ? (agent.g2g / agent.days) : 0;
-                        let absentDays = elapsedWorkingDays - (agent.days || 0);
-                        if (absentDays < 0) absentDays = 0;
+                        let absDays = agent.absDays !== undefined ? agent.absDays : 0;
                         let type = agent.type || "Full-Time";
 
                         let kpiStatusHtml = "";
                         if (type === "Part-Time") {
                             kpiStatusHtml = '<span class="badge not-qualified">Not Eligible (Part-Time)</span>';
                         } else {
-                            // Full-time condition: ratio >= 1.0 and absentDays <= 2
-                            if (ratio >= 1.0 && absentDays <= 2) {
+                            // Full-time condition: ratio >= 1.0 and absDays <= 2
+                            if (ratio >= 1.0 && absDays <= 2) {
                                 kpiStatusHtml = '<span class="badge tier3">KPI Achieved 🎉</span>';
                             } else {
                                 let reasons = [];
                                 if (ratio < 1.0) reasons.push("Ratio < 1.0");
-                                if (absentDays > 2) reasons.push(`Absence > 2 days (${absentDays} days)`);
+                                if (absDays > 2) reasons.push("Absence > 2 days");
                                 kpiStatusHtml = `<span class="badge not-qualified">Not Achieved (${reasons.join(", ")})</span>`;
                             }
                         }
@@ -619,9 +569,9 @@
                             <td><b>${agent.name}</b></td>
                             <td>${team.teamName}</td>
                             <td>${type}</td>
-                            <td>${agent.g2g} G2G / ${agent.days} Attended Days</td>
+                            <td>${agent.g2g} G2G / ${agent.days} Days</td>
                             <td><b style="color: var(--accent-blue);">${ratio.toFixed(2)}</b></td>
-                            <td><b style="color: #f87171;">${absentDays} Days</b></td>
+                            <td>${absDays} Days</td>
                             <td>${kpiStatusHtml}</td>
                         </tr>`;
                     }
@@ -634,7 +584,7 @@
         window.teamsData.forEach(team => {
             let agent = team.agents.find(a => a.id === agentId);
             if (agent) {
-                if (field === 'g2g' || field === 'days') {
+                if (field === 'g2g' || field === 'days' || field === 'absDays') {
                     agent[field] = parseFloat(value) || 0;
                 } else {
                     agent[field] = value.trim();
