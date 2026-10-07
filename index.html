@@ -47,12 +47,14 @@
         .logo-area { 
             display: flex; 
             align-items: center; 
+            gap: 10px;
             justify-self: start;
         }
         .logo-img {
-            height: 42px;
+            height: 38px;
             width: auto;
             object-fit: contain;
+            border-radius: 6px;
         }
 
         .navbar-title {
@@ -172,14 +174,10 @@
 
 <div class="container">
     <div class="navbar">
-        <!-- Logo 3l shmal b esmo el 7o2e2y -->
         <div class="logo-area">
-            <img src="GGO-White-Var3 (1).png" alt="GGO Logo" class="logo-img">
+            <img src="https://via.placeholder.com/120x40/0ea5e9/ffffff?text=GGO+LOGO" alt="GGO Logo" class="logo-img">
         </div>
-        
-        <!-- GGO Targets fel nos -->
         <div class="navbar-title">GGO Targets</div>
-        
         <div class="nav-badge">Professional Edition</div>
     </div>
 
@@ -333,6 +331,7 @@
         }
     ];
 
+    // تحميل البيانات المحفوظة أو استخدام الافتراضية
     let teamsData = JSON.parse(localStorage.getItem("ggo_teams_data")) || defaultTeamsData;
 
     function saveToLocalStorage() {
@@ -446,3 +445,120 @@
                             agentStatusHtml = getAgentLogisticsTierInfo(numericRatio, agent.days, agent.g2g);
                         } else {
                             agentStatusHtml = `<span style="color: var(--text-muted); font-size: 12px;">Standard Team Agent</span>`;
+                        }
+
+                        agentsTableBody.innerHTML += `<tr>
+                            <td><input type="text" class="editable-text" value="${agent.name}" ${isInactive ? 'disabled style="color: #64748b;"' : `onchange="updateAgent(${agent.id}, 'name', this.value)"`}></td>
+                            <td>
+                                <select class="editable-select" ${isInactive ? 'disabled' : `onchange="moveAgent(${agent.id}, this.value)"`}>
+                                    <option value="Wazowski" ${team.teamName === 'Wazowski' ? 'selected' : ''}>Wazowski</option>
+                                    <option value="Bloom" ${team.teamName === 'Bloom' ? 'selected' : ''}>Bloom</option>
+                                    <option value="PGX" ${team.teamName === 'PGX' ? 'selected' : ''}>PGX</option>
+                                    <option value="Logistics" ${team.teamName === 'Logistics' ? 'selected' : ''}>Logistics</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="editable-select" onchange="updateAgent(${agent.id}, 'status', this.value)">
+                                    <option value="Active" ${agent.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="On Probation" ${agent.status === 'On Probation' ? 'selected' : ''}>On Probation</option>
+                                    <option value="Two Weeks Notice" ${agent.status === 'Two Weeks Notice' ? 'selected' : ''}>Two Weeks Notice</option>
+                                    <option value="Resigned" ${agent.status === 'Resigned' ? 'selected' : ''}>Resigned</option>
+                                    <option value="Terminated" ${agent.status === 'Terminated' ? 'selected' : ''}>Terminated</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="editable-input" value="${agent.g2g}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'g2g', this.value)"`}></td>
+                            <td><input type="number" class="editable-input" value="${agent.days}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'days', this.value)"`}></td>
+                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
+                            <td>${agentStatusHtml}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+            }
+        });
+    }
+
+    function updateAgent(agentId, field, value) {
+        teamsData.forEach(team => {
+            let agent = team.agents.find(a => a.id === agentId);
+            if (agent) {
+                if (field === 'g2g' || field === 'days') {
+                    agent[field] = parseFloat(value) || 0;
+                } else {
+                    agent[field] = value.trim();
+                }
+                saveToLocalStorage();
+                renderAll();
+            }
+        });
+    }
+
+    function moveAgent(agentId, newTeamName) {
+        let targetAgent = null;
+        teamsData.forEach(team => {
+            let idx = team.agents.findIndex(a => a.id === agentId);
+            if (idx !== -1) {
+                targetAgent = team.agents[idx];
+                team.agents.splice(idx, 1);
+            }
+        });
+
+        if (targetAgent) {
+            let destTeam = teamsData.find(t => t.teamName === newTeamName);
+            if (destTeam) {
+                destTeam.agents.push(targetAgent);
+                saveToLocalStorage();
+                renderAll();
+            }
+        }
+    }
+
+    function addNewAgent() {
+        let name = document.getElementById("newAgentName").value.trim();
+        let teamName = document.getElementById("newAgentTeam").value;
+        let g2g = parseFloat(document.getElementById("newAgentG2G").value);
+        let days = parseFloat(document.getElementById("newAgentDays").value);
+        let status = document.getElementById("newAgentStatus").value;
+
+        if (!name || isNaN(g2g) || isNaN(days)) {
+            alert("Please fill in all agent fields correctly!");
+            return;
+        }
+
+        let team = teamsData.find(t => t.teamName === teamName);
+        if (team) {
+            let newId = Date.now();
+            team.agents.push({ id: newId, name, g2g, days, status });
+            document.getElementById("newAgentName").value = "";
+            document.getElementById("newAgentG2G").value = "";
+            document.getElementById("newAgentDays").value = "";
+            saveToLocalStorage();
+            renderAll();
+        }
+    }
+
+    function deleteAgent(agentId) {
+        if (confirm("Are you sure you want to delete this agent?")) {
+            teamsData.forEach(team => {
+                team.agents = team.agents.filter(a => a.id !== agentId);
+            });
+            saveToLocalStorage();
+            renderAll();
+        }
+    }
+
+    function resetToDefault() {
+        if (confirm("Are you sure you want to reset all data to default? All edits will be lost!")) {
+            localStorage.removeItem("ggo_teams_data");
+            teamsData = JSON.parse(JSON.stringify(defaultTeamsData));
+            renderAll();
+        }
+    }
+
+    renderAll();
+</script>
+
+</body>
+</html>
