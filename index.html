@@ -299,7 +299,7 @@
                     <th>G2G Sales</th>
                     <th>Attended Days</th>
                     <th>Agent Ratio</th>
-                    <th>Agent Tier Status (Logistics Focus)</th>
+                    <th>Agent Tier Status & Target Focus</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -327,6 +327,21 @@
         } else {
             let diff = (0.85 - ratio).toFixed(2);
             return { badge: '<span class="badge not-qualified">Below Target</span>', next: `Needs +${diff} ratio to reach Tier 1` };
+        }
+    }
+
+    function getAgentStandardTierInfo(ratio, days, g2g) {
+        if (ratio >= 1.2) {
+            return '<span class="badge tier3">Tier 3 Achieved</span> (Max Tier)';
+        } else if (ratio >= 1.0) {
+            let neededG2G = Math.ceil(1.2 * days) - g2g;
+            return `<span class="badge tier2">Tier 2 Achieved</span> <span class="next-tier-info">Needs +${neededG2G > 0 ? neededG2G : 1} G2G's to reach Tier 3</span>`;
+        } else if (ratio >= 0.85) {
+            let neededG2G = Math.ceil(1.0 * days) - g2g;
+            return `<span class="badge tier1">Tier 1 Achieved</span> <span class="next-tier-info">Needs +${neededG2G > 0 ? neededG2G : 1} G2G's to reach Tier 2</span>`;
+        } else {
+            let neededG2G = Math.ceil(0.85 * days) - g2g;
+            return `<span class="badge not-qualified">Below Target</span> <span class="next-tier-info">Needs +${neededG2G > 0 ? neededG2G : 1} G2G's to reach Tier 1</span>`;
         }
     }
 
@@ -416,7 +431,7 @@
                         if (team.teamName === "Logistics") {
                             agentStatusHtml = getAgentLogisticsTierInfo(numericRatio, agent.days, agent.g2g);
                         } else {
-                            agentStatusHtml = `<span style="color: var(--text-muted); font-size: 12px;">Standard Team Agent</span>`;
+                            agentStatusHtml = getAgentStandardTierInfo(numericRatio, agent.days, agent.g2g);
                         }
 
                         agentsTableBody.innerHTML += `<tr>
