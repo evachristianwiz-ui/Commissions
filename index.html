@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GGO - Team Leaders Commissions CRM (Manual Mode)</title>
+    <title>GGO - Team Leaders Commissions CRM (Manual Tiers Mode)</title>
     
     <style>
         :root {
@@ -43,17 +43,18 @@
         tr:hover { background-color: rgba(255,255,255,0.02); }
 
         .editable-input { width: 70px; padding: 6px 8px; background: #080e21; border: 1px solid var(--border-color); color: var(--accent-blue); font-weight: bold; border-radius: 6px; text-align: center; }
-        .editable-input:focus { border-color: var(--accent-blue); background: #111c38; }
-        .editable-text { background: transparent; border: none; color: white; font-weight: bold; font-size: 13px; width: 150px; padding: 6px; border-radius: 4px; }
-        .editable-text:focus { background: #080e21; border: 1px solid var(--border-color); outline: none; }
+        .editable-text { background: transparent; border: none; color: white; font-weight: bold; font-size: 13px; width: 150px; padding: 6px; }
         .editable-select { background: #080e21; color: white; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; font-size: 12px; }
 
         .badge { padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
-        .tier3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .not-qualified { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .tier3 { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .tier2 { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+        .tier1 { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+        .not-qualified { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        
+        .next-tier-info { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block; }
         .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .btn-delete:hover { background: #dc2626; }
-
+        
         .form-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; margin-bottom: 24px; }
         .form-box h3 { margin-top: 0; color: white; font-size: 16px; margin-bottom: 15px; }
         .form-grid { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -65,12 +66,12 @@
 
 <div class="container">
     <div class="navbar">
-        <div class="logo-area">GGO CRM - Manual Teams Mode</div>
-        <div class="nav-links"><a href="#">Manual Control Panel</a></div>
+        <div class="logo-area">GGO CRM - Teams & Tiers Control</div>
+        <div class="nav-links"><a href="#">Manual Tiers Mode</a></div>
     </div>
 
     <div class="page-header">
-        <div class="page-title"><span>|</span> Team Leaders Commission Tracker (Manual Entry)</div>
+        <div class="page-title"><span>|</span> Team Leaders & Agents Performance Tiers</div>
     </div>
 
     <div class="stats-grid">
@@ -100,26 +101,24 @@
     </div>
 
     <div class="table-container">
-        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Team Leaders Performance Overview</h3>
+        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Team Leaders Performance & Tiers Overview</h3>
         <table>
             <thead>
                 <tr>
                     <th>Team Name</th>
                     <th>Team Leader</th>
-                    <th>Total Team G2G'S</th>
-                    <th>Total Attended Days</th>
-                    <th>Team Average Ratio</th>
-                    <th>Target Status</th>
+                    <th>Total G2G / Days</th>
+                    <th>Team Ratio</th>
+                    <th>Achieved Tier</th>
+                    <th>Progress to Next Tier</th>
                 </tr>
             </thead>
-            <tbody id="teamTableBody">
-                <!-- Loaded dynamically -->
-            </tbody>
+            <tbody id="teamTableBody"></tbody>
         </table>
     </div>
 
     <div class="form-box">
-        <h3>Add New Agent to Team</h3>
+        <h3>Add New Agent</h3>
         <div class="form-grid">
             <input type="text" id="newAgentName" placeholder="Agent Full Name">
             <select id="newAgentTeam">
@@ -128,19 +127,18 @@
                 <option value="PGX">PGX</option>
                 <option value="Logistics">Logistics</option>
             </select>
-            <input type="number" id="newAgentG2G" placeholder="Initial G2G Sales">
+            <input type="number" id="newAgentG2G" placeholder="G2G Sales">
             <input type="number" id="newAgentDays" placeholder="Attended Days">
             <select id="newAgentStatus">
                 <option value="Active">Active</option>
                 <option value="Resigned">Resigned</option>
-                <option value="Terminated">Terminated</option>
             </select>
             <button class="btn-green" onclick="addNewAgent()">Add Agent</button>
         </div>
     </div>
 
     <div class="table-container">
-        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Agents Direct Edit Panel</h3>
+        <h3 style="padding: 15px 16px; margin: 0; color: white; border-bottom: 1px solid var(--border-color);">Agents Detailed List & Logistics Individual Tiers</h3>
         <table>
             <thead>
                 <tr>
@@ -149,19 +147,16 @@
                     <th>G2G Sales</th>
                     <th>Attended Days</th>
                     <th>Agent Ratio</th>
-                    <th>Status</th>
+                    <th>Agent Tier Status (Logistics Focus)</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="agentsTableBody">
-                <!-- Loaded dynamically -->
-            </tbody>
+            <tbody id="agentsTableBody"></tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // جميع أسماء الأجينتس والتيم ليدرز بالترتيب الصحيح 100%
     let teamsData = [
         {
             teamName: "Wazowski",
@@ -225,6 +220,35 @@
         renderAgentsTable();
     }
 
+    // حساب تيرات التيمات العادية (Wazowski, Bloom, PGX)
+    function getTeamTierInfo(ratio) {
+        if (ratio >= 1.2) {
+            return { badge: '<span class="badge tier3">Tier 3 Achieved</span>', next: 'Max Tier Reached! 🎉' };
+        } else if (ratio >= 1.0) {
+            let diff = (1.2 - ratio).toFixed(2);
+            return { badge: '<span class="badge tier2">Tier 2 Achieved</span>', next: `Needs +${diff} ratio to reach Tier 3` };
+        } else if (ratio >= 0.85) {
+            let diff = (1.0 - ratio).toFixed(2);
+            return { badge: '<span class="badge tier1">Tier 1 Achieved</span>', next: `Needs +${diff} ratio to reach Tier 2` };
+        } else {
+            let diff = (0.85 - ratio).toFixed(2);
+            return { badge: '<span class="badge not-qualified">Below Target</span>', next: `Needs +${diff} ratio to reach Tier 1` };
+        }
+    }
+
+    // حساب تيرات أجينتس اللوجستيكس الفردية
+    function getAgentLogisticsTierInfo(ratio, days, g2g) {
+        if (ratio >= 3.0) {
+            return '<span class="badge tier2">Logistics Tier 2 Achieved 🚀</span> (Max Tier)';
+        } else if (ratio >= 2.5) {
+            let neededG2GForTier2 = Math.ceil(3.0 * days) - g2g;
+            return `<span class="badge tier1">Logistics Tier 1 Achieved</span> <span class="next-tier-info">Needs +${neededG2GForTier2} G2G's to reach Tier 2</span>`;
+        } else {
+            let neededG2GForTier1 = Math.ceil(2.5 * days) - g2g;
+            return `<span class="badge not-qualified">Below Target</span> <span class="next-tier-info">Needs +${neededG2GForTier1 > 0 ? neededG2GForTier1 : 1} G2G's to reach Tier 1</span>`;
+        }
+    }
+
     function renderTeamsSummary() {
         const selectedFilter = document.getElementById("filterTeam").value;
         const teamTableBody = document.getElementById("teamTableBody");
@@ -232,7 +256,6 @@
 
         let qualifiedCount = 0;
         let belowCount = 0;
-
         let filteredTeams = teamsData.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
 
         filteredTeams.forEach(team => {
@@ -242,22 +265,29 @@
             let teamRatio = totalDays > 0 ? (totalG2G / totalDays).toFixed(2) : 0;
             let numericRatio = parseFloat(teamRatio);
 
-            let targetThreshold = (team.teamName === "Logistics") ? 2.5 : 0.85;
-            let isAchieved = numericRatio >= targetThreshold;
+            let tierData = { badge: '', next: '' };
+            let isAchieved = false;
+
+            if (team.teamName === "Logistics") {
+                // تيم لوجستيكس بيعتمد على متوسط الأجينتس جوه التيم كمؤشر عام
+                let avgLogisticsRatio = agentsList.length > 0 ? agentsList.reduce((sum, a) => sum + ((a.days > 0) ? (a.g2g / a.days) : 0), 0) / agentsList.length : 0;
+                isAchieved = avgLogisticsRatio >= 2.5;
+                tierData.badge = avgLogisticsRatio >= 2.5 ? '<span class="badge tier1">Logistics Team Active</span>' : '<span class="badge not-qualified">Below Target</span>';
+                tierData.next = `Average Agent Ratio: ${avgLogisticsRatio.toFixed(2)}`;
+            } else {
+                tierData = getTeamTierInfo(numericRatio);
+                isAchieved = numericRatio >= 0.85;
+            }
 
             if (isAchieved) qualifiedCount++; else belowCount++;
-
-            let statusHtml = isAchieved 
-                ? `<span class="badge tier3">Achieved (Qualified)</span>` 
-                : `<span class="badge not-qualified">Below Target</span>`;
 
             teamTableBody.innerHTML += `<tr>
                 <td><b>${team.teamName}</b></td>
                 <td>${team.leader}</td>
-                <td>${totalG2G}</td>
-                <td>${totalDays}</td>
+                <td>${totalG2G} G2G / ${totalDays} Days</td>
                 <td><b style="color: var(--accent-blue);">${teamRatio}</b></td>
-                <td>${statusHtml}</td>
+                <td>${tierData.badge}</td>
+                <td><span style="color: var(--text-muted); font-size: 12px;">${tierData.next}</span></td>
             </tr>`;
         });
 
@@ -278,6 +308,15 @@
                 agentsList.forEach(agent => {
                     if (agent.name.toLowerCase().includes(searchQuery)) {
                         let ratio = agent.days > 0 ? (agent.g2g / agent.days).toFixed(2) : 0;
+                        let numericRatio = parseFloat(ratio);
+                        
+                        let agentStatusHtml = "";
+                        if (team.teamName === "Logistics") {
+                            agentStatusHtml = getAgentLogisticsTierInfo(numericRatio, agent.days, agent.g2g);
+                        } else {
+                            agentStatusHtml = `<span style="color: var(--text-muted); font-size: 12px;">Standard Team Agent (Depends on Team Ratio)</span>`;
+                        }
+
                         agentsTableBody.innerHTML += `<tr>
                             <td><input type="text" class="editable-text" value="${agent.name}" onchange="updateAgent(${agent.id}, 'name', this.value)"></td>
                             <td>
@@ -291,13 +330,7 @@
                             <td><input type="number" class="editable-input" value="${agent.g2g}" onchange="updateAgent(${agent.id}, 'g2g', this.value)"></td>
                             <td><input type="number" class="editable-input" value="${agent.days}" onchange="updateAgent(${agent.id}, 'days', this.value)"></td>
                             <td><b style="color: var(--accent-blue);">${ratio}</b></td>
-                            <td>
-                                <select class="editable-select" onchange="updateAgent(${agent.id}, 'status', this.value)">
-                                    <option value="Active" ${agent.status === 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Resigned" ${agent.status === 'Resigned' ? 'selected' : ''}>Resigned</option>
-                                    <option value="Terminated" ${agent.status === 'Terminated' ? 'selected' : ''}>Terminated</option>
-                                </select>
-                            </td>
+                            <td>${agentStatusHtml}</td>
                             <td>
                                 <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
                             </td>
@@ -373,7 +406,6 @@
         }
     }
 
-    // Load initial render
     renderAll();
 </script>
 
