@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GGO Targets - Performance Dashboard</title>
+    <title>GGO Targets - Performance Dashboard (Cloud Sync)</title>
     
     <!-- Google Fonts for Professional Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -169,21 +169,135 @@
         .btn-green { background: var(--accent-green); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; transition: opacity 0.2s; }
         .btn-green:hover { opacity: 0.9; }
     </style>
+
+    <!-- Firebase SDK Scripts (Modular via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9wc_Kw9acJDHJbdySpMsvwQAROUn6HO4",
+            authDomain: "ggo-targets-crm.firebaseapp.com",
+            projectId: "ggo-targets-crm",
+            storageBucket: "ggo-targets-crm.firebasestorage.app",
+            messagingSenderId: "222843213193",
+            appId: "1:222843213193:web:78c343d7efb71ae7aa7d58",
+            measurementId: "G-XZCCYXKECN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const defaultTeamsData = [
+            {
+                teamName: "Wazowski",
+                leader: "Mavis Miller",
+                agents: [
+                    { id: 1, name: "Victor Collins", g2g: 20, days: 20, status: "Active" },
+                    { id: 2, name: "Adam Smith", g2g: 20, days: 20, status: "Active" },
+                    { id: 3, name: "Mia Cooper", g2g: 20, days: 20, status: "Active" },
+                    { id: 4, name: "Jessy Moore", g2g: 20, days: 20, status: "Active" },
+                    { id: 5, name: "Amy Jonson", g2g: 20, days: 20, status: "Active" }
+                ]
+            },
+            {
+                teamName: "Bloom",
+                leader: "Donna Bell",
+                agents: [
+                    { id: 6, name: "Celine Dami", g2g: 20, days: 20, status: "Active" },
+                    { id: 7, name: "Kim Collins", g2g: 20, days: 20, status: "Active" },
+                    { id: 8, name: "Heaven Davis", g2g: 20, days: 20, status: "Active" },
+                    { id: 9, name: "Maddy Snow", g2g: 20, days: 20, status: "Active" },
+                    { id: 10, name: "Jules Brown", g2g: 20, days: 20, status: "Active" },
+                    { id: 11, name: "Anna Nelson", g2g: 20, days: 20, status: "Active" },
+                    { id: 12, name: "Jennifer Adams", g2g: 20, days: 20, status: "Active" },
+                    { id: 13, name: "Katherine Adams", g2g: 20, days: 20, status: "Active" },
+                    { id: 14, name: "Eric Dean", g2g: 20, days: 20, status: "Active" },
+                    { id: 15, name: "Roben Neves", g2g: 20, days: 20, status: "Active" }
+                ]
+            },
+            {
+                teamName: "PGX",
+                leader: "Jordan Kelly",
+                agents: [
+                    { id: 16, name: "Stewart Martin", g2g: 20, days: 20, status: "Active" },
+                    { id: 17, name: "Michael Morgan", g2g: 20, days: 20, status: "Active" },
+                    { id: 18, name: "Jeremy Welson", g2g: 20, days: 20, status: "Active" },
+                    { id: 19, name: "Diana Smith", g2g: 20, days: 20, status: "Active" },
+                    { id: 20, name: "Hannah vance", g2g: 20, days: 20, status: "Active" },
+                    { id: 21, name: "camila johns", g2g: 20, days: 20, status: "Active" },
+                    { id: 22, name: "caitlyn adam", g2g: 20, days: 20, status: "Active" },
+                    { id: 23, name: "Owen willson", g2g: 20, days: 20, status: "Active" }
+                ]
+            },
+            {
+                teamName: "Logistics",
+                leader: "Joey Millner",
+                agents: [
+                    { id: 24, name: "Marcy miller", g2g: 50, days: 20, status: "Active" },
+                    { id: 25, name: "liz fox", g2g: 50, days: 20, status: "Active" },
+                    { id: 26, name: "Melaine Brown", g2g: 50, days: 20, status: "Active" },
+                    { id: 27, name: "Ben Camel", g2g: 50, days: 20, status: "Active" },
+                    { id: 28, name: "Oscar Camel", g2g: 50, days: 20, status: "Active" },
+                    { id: 29, name: "David Green", g2g: 50, days: 20, status: "Active" },
+                    { id: 30, name: "Luke Grant", g2g: 50, days: 20, status: "Active" },
+                    { id: 31, name: "Rachel Adams", g2g: 50, days: 20, status: "Active" }
+                ]
+            }
+        ];
+
+        window.teamsData = JSON.parse(JSON.stringify(defaultTeamsData));
+
+        async function loadDataFromCloud() {
+            try {
+                const docRef = doc(db, "crm", "octoberData");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    window.teamsData = docSnap.data().teams;
+                } else {
+                    await setDoc(docRef, { teams: defaultTeamsData });
+                }
+                window.renderAll();
+            } catch (error) {
+                console.error("Error loading cloud data:", error);
+                window.renderAll();
+            }
+        }
+
+        window.saveToCloud = async function() {
+            try {
+                const docRef = doc(db, "crm", "octoberData");
+                await setDoc(docRef, { teams: window.teamsData });
+            } catch (error) {
+                console.error("Error saving to cloud:", error);
+            }
+        };
+
+        window.resetCloudData = async function() {
+            if (confirm("Are you sure you want to reset all cloud data to default?")) {
+                window.teamsData = JSON.parse(JSON.stringify(defaultTeamsData));
+                await window.saveToCloud();
+                window.renderAll();
+            }
+        };
+
+        loadDataFromCloud();
+    </script>
 </head>
 <body>
 
 <div class="container">
     <div class="navbar">
         <div class="logo-area">
-            <img src="https://via.placeholder.com/120x40/0ea5e9/ffffff?text=GGO+LOGO" alt="GGO Logo" class="logo-img">
+            <img src="GGO-White-Var3 (1).png" alt="GGO Logo" class="logo-img">
         </div>
         <div class="navbar-title">GGO Targets</div>
-        <div class="nav-badge">Professional Edition</div>
+        <div class="nav-badge">Cloud Sync (Firebase)</div>
     </div>
 
     <div class="page-header">
         <div class="page-title"><span>|</span> Team Leaders & Agents Performance Dashboard</div>
-        <button class="btn-reset" onclick="resetToDefault()">Reset Data to Default</button>
+        <button class="btn-reset" onclick="window.resetCloudData()">Reset Cloud Data</button>
     </div>
 
     <div class="stats-grid">
@@ -273,72 +387,8 @@
 </div>
 
 <script>
-    const defaultTeamsData = [
-        {
-            teamName: "Wazowski",
-            leader: "Mavis Miller",
-            agents: [
-                { id: 1, name: "Victor Collins", g2g: 20, days: 20, status: "Active" },
-                { id: 2, name: "Adam Smith", g2g: 20, days: 20, status: "Active" },
-                { id: 3, name: "Mia Cooper", g2g: 20, days: 20, status: "Active" },
-                { id: 4, name: "Jessy Moore", g2g: 20, days: 20, status: "Active" },
-                { id: 5, name: "Amy Jonson", g2g: 20, days: 20, status: "Active" }
-            ]
-        },
-        {
-            teamName: "Bloom",
-            leader: "Donna Bell",
-            agents: [
-                { id: 6, name: "Celine Dami", g2g: 20, days: 20, status: "Active" },
-                { id: 7, name: "Kim Collins", g2g: 20, days: 20, status: "Active" },
-                { id: 8, name: "Heaven Davis", g2g: 20, days: 20, status: "Active" },
-                { id: 9, name: "Maddy Snow", g2g: 20, days: 20, status: "Active" },
-                { id: 10, name: "Jules Brown", g2g: 20, days: 20, status: "Active" },
-                { id: 11, name: "Anna Nelson", g2g: 20, days: 20, status: "Active" },
-                { id: 12, name: "Jennifer Adams", g2g: 20, days: 20, status: "Active" },
-                { id: 13, name: "Katherine Adams", g2g: 20, days: 20, status: "Active" },
-                { id: 14, name: "Eric Dean", g2g: 20, days: 20, status: "Active" },
-                { id: 15, name: "Roben Neves", g2g: 20, days: 20, status: "Active" }
-            ]
-        },
-        {
-            teamName: "PGX",
-            leader: "Jordan Kelly",
-            agents: [
-                { id: 16, name: "Stewart Martin", g2g: 20, days: 20, status: "Active" },
-                { id: 17, name: "Michael Morgan", g2g: 20, days: 20, status: "Active" },
-                { id: 18, name: "Jeremy Welson", g2g: 20, days: 20, status: "Active" },
-                { id: 19, name: "Diana Smith", g2g: 20, days: 20, status: "Active" },
-                { id: 20, name: "Hannah vance", g2g: 20, days: 20, status: "Active" },
-                { id: 21, name: "camila johns", g2g: 20, days: 20, status: "Active" },
-                { id: 22, name: "caitlyn adam", g2g: 20, days: 20, status: "Active" },
-                { id: 23, name: "Owen willson", g2g: 20, days: 20, status: "Active" }
-            ]
-        },
-        {
-            teamName: "Logistics",
-            leader: "Joey Millner",
-            agents: [
-                { id: 24, name: "Marcy miller", g2g: 50, days: 20, status: "Active" },
-                { id: 25, name: "liz fox", g2g: 50, days: 20, status: "Active" },
-                { id: 26, name: "Melaine Brown", g2g: 50, days: 20, status: "Active" },
-                { id: 27, name: "Ben Camel", g2g: 50, days: 20, status: "Active" },
-                { id: 28, name: "Oscar Camel", g2g: 50, days: 20, status: "Active" },
-                { id: 29, name: "David Green", g2g: 50, days: 20, status: "Active" },
-                { id: 30, name: "Luke Grant", g2g: 50, days: 20, status: "Active" },
-                { id: 31, name: "Rachel Adams", g2g: 50, days: 20, status: "Active" }
-            ]
-        }
-    ];
-
-    // تحميل البيانات المحفوظة أو استخدام الافتراضية
-    let teamsData = JSON.parse(localStorage.getItem("ggo_teams_data")) || defaultTeamsData;
-
-    function saveToLocalStorage() {
-        localStorage.setItem("ggo_teams_data", JSON.stringify(teamsData));
-    }
-
-    function renderAll() {
+    window.renderAll = function() {
+        if (!window.teamsData) return;
         renderTeamsSummary();
         renderAgentsTable();
     }
@@ -377,7 +427,7 @@
 
         let qualifiedCount = 0;
         let belowCount = 0;
-        let filteredTeams = teamsData.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
+        let filteredTeams = window.teamsData.filter(t => selectedFilter === "" || t.teamName === selectedFilter);
 
         filteredTeams.forEach(team => {
             let agentsList = team.agents || [];
@@ -421,7 +471,7 @@
 
         document.getElementById("qualifiedTeamsCount").innerText = qualifiedCount;
         document.getElementById("belowTeamsCount").innerText = belowCount;
-        document.getElementById("totalTeamsCount").innerText = teamsData.length;
+        document.getElementById("totalTeamsCount").innerText = window.teamsData.length;
     }
 
     function renderAgentsTable() {
@@ -430,7 +480,7 @@
         const agentsTableBody = document.getElementById("agentsTableBody");
         agentsTableBody.innerHTML = "";
 
-        teamsData.forEach(team => {
+        window.teamsData.forEach(team => {
             if (selectedFilter === "" || team.teamName === selectedFilter) {
                 let agentsList = team.agents || [];
                 agentsList.forEach(agent => {
@@ -461,104 +511,4 @@
                                 <select class="editable-select" onchange="updateAgent(${agent.id}, 'status', this.value)">
                                     <option value="Active" ${agent.status === 'Active' ? 'selected' : ''}>Active</option>
                                     <option value="On Probation" ${agent.status === 'On Probation' ? 'selected' : ''}>On Probation</option>
-                                    <option value="Two Weeks Notice" ${agent.status === 'Two Weeks Notice' ? 'selected' : ''}>Two Weeks Notice</option>
-                                    <option value="Resigned" ${agent.status === 'Resigned' ? 'selected' : ''}>Resigned</option>
-                                    <option value="Terminated" ${agent.status === 'Terminated' ? 'selected' : ''}>Terminated</option>
-                                </select>
-                            </td>
-                            <td><input type="number" class="editable-input" value="${agent.g2g}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'g2g', this.value)"`}></td>
-                            <td><input type="number" class="editable-input" value="${agent.days}" ${isInactive ? 'disabled' : `onchange="updateAgent(${agent.id}, 'days', this.value)"`}></td>
-                            <td><b style="color: var(--accent-blue);">${ratio}</b></td>
-                            <td>${agentStatusHtml}</td>
-                            <td>
-                                <button class="btn-delete" onclick="deleteAgent(${agent.id})">Delete</button>
-                            </td>
-                        </tr>`;
-                    }
-                });
-            }
-        });
-    }
-
-    function updateAgent(agentId, field, value) {
-        teamsData.forEach(team => {
-            let agent = team.agents.find(a => a.id === agentId);
-            if (agent) {
-                if (field === 'g2g' || field === 'days') {
-                    agent[field] = parseFloat(value) || 0;
-                } else {
-                    agent[field] = value.trim();
-                }
-                saveToLocalStorage();
-                renderAll();
-            }
-        });
-    }
-
-    function moveAgent(agentId, newTeamName) {
-        let targetAgent = null;
-        teamsData.forEach(team => {
-            let idx = team.agents.findIndex(a => a.id === agentId);
-            if (idx !== -1) {
-                targetAgent = team.agents[idx];
-                team.agents.splice(idx, 1);
-            }
-        });
-
-        if (targetAgent) {
-            let destTeam = teamsData.find(t => t.teamName === newTeamName);
-            if (destTeam) {
-                destTeam.agents.push(targetAgent);
-                saveToLocalStorage();
-                renderAll();
-            }
-        }
-    }
-
-    function addNewAgent() {
-        let name = document.getElementById("newAgentName").value.trim();
-        let teamName = document.getElementById("newAgentTeam").value;
-        let g2g = parseFloat(document.getElementById("newAgentG2G").value);
-        let days = parseFloat(document.getElementById("newAgentDays").value);
-        let status = document.getElementById("newAgentStatus").value;
-
-        if (!name || isNaN(g2g) || isNaN(days)) {
-            alert("Please fill in all agent fields correctly!");
-            return;
-        }
-
-        let team = teamsData.find(t => t.teamName === teamName);
-        if (team) {
-            let newId = Date.now();
-            team.agents.push({ id: newId, name, g2g, days, status });
-            document.getElementById("newAgentName").value = "";
-            document.getElementById("newAgentG2G").value = "";
-            document.getElementById("newAgentDays").value = "";
-            saveToLocalStorage();
-            renderAll();
-        }
-    }
-
-    function deleteAgent(agentId) {
-        if (confirm("Are you sure you want to delete this agent?")) {
-            teamsData.forEach(team => {
-                team.agents = team.agents.filter(a => a.id !== agentId);
-            });
-            saveToLocalStorage();
-            renderAll();
-        }
-    }
-
-    function resetToDefault() {
-        if (confirm("Are you sure you want to reset all data to default? All edits will be lost!")) {
-            localStorage.removeItem("ggo_teams_data");
-            teamsData = JSON.parse(JSON.stringify(defaultTeamsData));
-            renderAll();
-        }
-    }
-
-    renderAll();
-</script>
-
-</body>
-</html>
+                                    <option value
