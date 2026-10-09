@@ -29,15 +29,41 @@ const teams=[
 ];
 const defaultTeamsData=teams.map(([teamName,leader,names,g2g],i)=>({teamName,leader,agents:names.map((name,j)=>({id:[0,5,15,23,31][i]+j+1,name,g2g,days:20,status:"Active",type:"Full-Time",absDays:0}))}));
 window.teamsData=JSON.parse(JSON.stringify(defaultTeamsData));
-let activeMonthKey="octoberData",unsubscribe=null,ready=false;
-window.switchMonth=function(key){activeMonthKey=key;ready=false;if(unsubscribe)unsubscribe();const ref=doc(db,"crm",key);unsubscribe=onSnapshot(ref,async snap=>{if(snap.exists()&&snap.data().teams){window.teamsData=snap.data().teams;}else{window.teamsData=JSON.parse(JSON.stringify(defaultTeamsData));await setDoc(ref,{teams:window.teamsData});}ready=true;window.renderAll?.();},e=>console.error("Firebase load error:",e));};
+let activeMonthKey="octoberData",unsubscribe=null,ready=false,monthRequest=0;
+window.switchMonth=function(key){
+  activeMonthKey=key;ready=false;const request=++monthRequest;
+  const oldStatus=document.getElementById("dataStatus");if(oldStatus)oldStatus.textContent="Loading " + (document.getElementById("activeMonth")?.selectedOptions[0]?.textContent||key) + " data…";
+  if(unsubscribe){unsubscribe();unsubscribe=null;}
+  const ref=doc(db,"crm",key);
+  unsubscribe=onSnapshot(ref,async snap=>{
+    if(request!==monthRequest)return;
+    try{
+      if(snap.exists()&&Array.isArray(snap.data().teams)){
+        window.teamsData=snap.data().teams;
+      }else{
+        window.teamsData=JSON.parse(JSON.stringify(defaultTeamsData));
+        await setDoc(ref,{teams:window.teamsData});
+      }
+      if(request!==monthRequest)return;
+      ready=true;window.renderAll?.();
+      const status=document.getElementById("dataStatus");if(status)status.textContent="Data loaded successfully";
+    }catch(err){
+      console.error("Firebase data load/save error:",err);
+      const status=document.getElementById("dataStatus");if(status)status.textContent="Could not load data. Check Firebase connection and permissions.";
+    }
+  },e=>{
+    if(request!==monthRequest)return;
+    ready=false;console.error("Firebase load error:",e);
+    const status=document.getElementById("dataStatus");if(status)status.textContent="Could not load data. Check Firebase connection and permissions.";
+  });
+};
 window.saveToCloud=async function(){if(!ready)return;try{await setDoc(doc(db,"crm",activeMonthKey),{teams:window.teamsData});}catch(e){console.error("Firebase save error:",e);alert("Could not save changes. Check Firebase permissions and connection.");}};
 window.addNewAgent=function(){const name=document.getElementById("newAgentName").value.trim(),teamName=document.getElementById("newAgentTeam").value,g2g=Number(document.getElementById("newAgentG2G").value),days=Number(document.getElementById("newAgentDays").value),status=document.getElementById("newAgentStatus").value,type=document.getElementById("newAgentType").value,absDays=Number(document.getElementById("newAgentAbsDays").value)||0;if(!name||document.getElementById("newAgentG2G").value===""||document.getElementById("newAgentDays").value===""){alert("Please fill in all agent fields correctly!");return;}const team=window.teamsData.find(t=>t.teamName===teamName);if(team){team.agents.push({id:Date.now(),name,g2g,days,status,type,absDays});["newAgentName","newAgentG2G","newAgentDays","newAgentAbsDays"].forEach(id=>document.getElementById(id).value="");window.renderAll();window.saveToCloud();}};
 </script>
 </head>
 <body><div class="container">
 <div class="navbar"><div class="logo-area"><img src="GGO-White-Var3 (1).png" alt="GGO Logo" class="logo-img"></div><div class="navbar-title">GGO Targets</div><div class="nav-badge">Live Cloud Sync</div></div>
-<div class="page-header"><div class="page-title"><span>|</span> Team Leaders & Agents Performance Dashboard</div><select id="activeMonth" onchange="window.switchMonth(this.value)"><option value="octoberData">October 2026</option><option value="novemberData">November 2026</option><option value="decemberData">December 2026</option><option value="january2027Data">January 2027</option><option value="february2027Data">February 2027</option><option value="march2027Data">March 2027</option><option value="april2027Data">April 2027</option><option value="may2027Data">May 2027</option><option value="june2027Data">June 2027</option><option value="july2027Data">July 2027</option><option value="august2027Data">August 2027</option><option value="september2027Data">September 2027</option><option value="october2027Data">October 2027</option><option value="november2027Data">November 2027</option><option value="december2027Data">December 2027</option></select></div>
+<div class="page-header"><div><div class="page-title"><span>|</span> Team Leaders & Agents Performance Dashboard</div><div id="dataStatus" style="font-size:12px;color:var(--text-muted);margin-top:6px" role="status" aria-live="polite">Connecting to October 2026…</div></div><select id="activeMonth" onchange="window.switchMonth(this.value)"><option value="octoberData">October 2026</option><option value="novemberData">November 2026</option><option value="decemberData">December 2026</option><option value="january2027Data">January 2027</option><option value="february2027Data">February 2027</option><option value="march2027Data">March 2027</option><option value="april2027Data">April 2027</option><option value="may2027Data">May 2027</option><option value="june2027Data">June 2027</option><option value="july2027Data">July 2027</option><option value="august2027Data">August 2027</option><option value="september2027Data">September 2027</option><option value="october2027Data">October 2027</option><option value="november2027Data">November 2027</option><option value="december2027Data">December 2027</option></select></div>
 <div class="stats-grid"><div class="stat-card"><div class="title">Total Teams</div><div class="value" id="totalTeamsCount">5</div></div><div class="stat-card"><div class="title">Teams Qualified (Achieved)</div><div class="value" id="qualifiedTeamsCount">0</div></div><div class="stat-card"><div class="title">Teams Below Target</div><div class="value" id="belowTeamsCount">0</div></div></div>
 <div class="filters-bar"><select id="filterTeam" onchange="renderAll()"><option value="">All Teams</option><option>Wazowski</option><option>Bloom</option><option>PGX</option><option>Logistics</option><option>The Hive</option></select><input id="searchAgent" placeholder="Search agent name..." oninput="renderAll()" style="max-width:260px"></div>
 <div class="table-container"><div class="table-header-title">Team Leaders Performance & Tiers Overview</div><table><thead><tr><th>Team Name</th><th>Team Leader</th><th>Total G2G / Days</th><th>Team Ratio</th><th>Achieved Tier</th><th>Progress to Next Tier</th></tr></thead><tbody id="teamTableBody"></tbody></table></div>
@@ -57,4 +83,10 @@ function renderKpisTable(){const body=document.getElementById("kpisTableBody");b
 window.updateAgent=function(id,field,value){for(const t of window.teamsData){const a=t.agents.find(x=>x.id===id);if(a){a[field]=["g2g","days","absDays"].includes(field)?(parseFloat(value)||0):value.trim();window.renderAll();window.saveToCloud();return;}}};
 window.moveAgent=function(id,name){let found;window.teamsData.forEach(t=>{const i=t.agents.findIndex(a=>a.id===id);if(i>=0)found=t.agents.splice(i,1)[0];});const dest=window.teamsData.find(t=>t.teamName===name);if(found&&dest){dest.agents.push(found);window.renderAll();window.saveToCloud();}};
 window.deleteAgent=function(id){if(confirm("Are you sure you want to delete this agent?")){window.teamsData.forEach(t=>t.agents=t.agents.filter(a=>a.id!==id));window.renderAll();window.saveToCloud();}};
+</script><script>
+// Load the selected month automatically on first page open, after render functions exist.
+document.addEventListener("DOMContentLoaded", function(){
+  const monthSelect=document.getElementById("activeMonth");
+  if(monthSelect && window.switchMonth) window.switchMonth(monthSelect.value || "octoberData");
+});
 </script></body></html>
